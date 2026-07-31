@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <Windows.h>
+#include <string>
 #include "resource.h"
 #include "App.h"
 #include "HAL/HAL.h"
@@ -33,17 +34,46 @@
 #pragma warning(pop)
 #endif
 
+static bool SetSimulatorAssetRoot()
+{
+    wchar_t modulePath[MAX_PATH] = {};
+    if (GetModuleFileNameW(nullptr, modulePath, MAX_PATH) == 0)
+    {
+        return false;
+    }
+
+    std::wstring directory(modulePath);
+    size_t separator = directory.find_last_of(L"\\/");
+    if (separator == std::wstring::npos) return false;
+    directory.resize(separator);
+
+    for (int level = 0; level < 8; ++level)
+    {
+        std::wstring mapPath = directory + L"\\SD\\MAP\\shenzhen.bin";
+        if (GetFileAttributesW(mapPath.c_str()) != INVALID_FILE_ATTRIBUTES)
+        {
+            return SetCurrentDirectoryW(directory.c_str()) != FALSE;
+        }
+
+        separator = directory.find_last_of(L"\\/");
+        if (separator == std::wstring::npos) break;
+        directory.resize(separator);
+    }
+    return false;
+}
+
 int main()
 {
     lv_init();
 
+    SetSimulatorAssetRoot();
     lv_fs_if_init();
 
     if (!lv_win32_init(
         GetModuleHandleW(NULL),
         SW_SHOW,
         240,
-        240,
+        320,
         LoadIconW(GetModuleHandleW(NULL), MAKEINTRESOURCE(IDI_LVGL))))
     {
         return -1;

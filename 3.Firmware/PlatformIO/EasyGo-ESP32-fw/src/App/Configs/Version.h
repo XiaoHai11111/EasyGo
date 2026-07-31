@@ -24,10 +24,10 @@
 #define __VERSION_H
 
 /* Firmware Version */
-#define VERSION_FIRMWARE_NAME   "[littleVisual]"
-#define VERSION_SOFTWARE        "v1.0"
-#define VERSION_HARDWARE        "v1.1"
-#define VERSION_AUTHOR_NAME     "PZH"
+#define VERSION_FIRMWARE_NAME   "[CareGo]"
+#define VERSION_SOFTWARE        "v0.0.1"
+#define VERSION_HARDWARE        "v0.0.1"
+#define VERSION_AUTHOR_NAME     "CareBridge"
 
 /* Number to string macro */
 #define _VERSION_NUM_TO_STR_(n)  #n

@@ -37,17 +37,38 @@
 
 #define NULL_PIN                    PD0
 
+/*
+ * ESP32 Dev Module bring-up profile.
+ *
+ * The original project targeted a different board and initialized peripherals
+ * on pins that conflict with the ST7789 display and I2C capacitive touch panel.
+ * Keep those peripherals disabled until their wiring is redesigned for this
+ * board.
+ */
+#define CONFIG_ENABLE_BLUETOOTH     0
+#define CONFIG_ENABLE_POWER         0
+#define CONFIG_ENABLE_ENCODER       0
+#define CONFIG_ENABLE_BUZZER        0
+#define CONFIG_ENABLE_AUDIO         1
+#define CONFIG_ENABLE_SD_CARD       0
+#define CONFIG_ENABLE_IMU           0
+#define CONFIG_ENABLE_TOUCH         1
+
 /* Screen */
-#define CONFIG_SCREEN_CS_PIN        PB0
-#define CONFIG_SCREEN_DC_PIN        PA4
-#define CONFIG_SCREEN_RST_PIN       PA6
-#define CONFIG_SCREEN_SCK_PIN       PA5
-#define CONFIG_SCREEN_MOSI_PIN      PA7
-#define CONFIG_SCREEN_BLK_PIN       12
+#define CONFIG_SCREEN_CS_PIN        5
+#define CONFIG_SCREEN_DC_PIN        27
+#define CONFIG_SCREEN_RST_PIN       16
+#define CONFIG_SCREEN_SCK_PIN       18
+#define CONFIG_SCREEN_MOSI_PIN      23
+#define CONFIG_SCREEN_MISO_PIN      19
+/* Connect the module LED pin to 3V3 for first bring-up. */
+#define CONFIG_SCREEN_BLK_PIN       -1
 
 #define CONFIG_SCREEN_HOR_RES       240
-#define CONFIG_SCREEN_VER_RES       240
+#define CONFIG_SCREEN_VER_RES       320
 #define CONFIG_SCREEN_BUFFER_SIZE   (CONFIG_SCREEN_HOR_RES * CONFIG_SCREEN_VER_RES /2)
+#define CONFIG_SCREEN_ROTATION      0
+#define CONFIG_SCREEN_SELF_TEST     1
 
 /* Battery */
 #define CONFIG_BAT_DET_PIN          37
@@ -58,13 +79,32 @@
 #define CONFIG_BUZZ_CHANNEL         2
 #define CONFIG_SOUND_ENABLE_DEFAULT true
 
+/*
+ * DFPlayer Mini UART2 connection (pin names are from the ESP32 side):
+ * ESP32 TX17 -- 1k resistor --> DFPlayer RX
+ * ESP32 RX26 <--------------- DFPlayer TX
+ * ESP32 GPIO34 <------------- DFPlayer BUSY (optional)
+ */
+#define CONFIG_AUDIO_USE_DFPLAYER   1
+#define CONFIG_DFPLAYER_RX_PIN      26
+#define CONFIG_DFPLAYER_TX_PIN      17
+#define CONFIG_DFPLAYER_BUSY_PIN    34
+#define CONFIG_DFPLAYER_VOLUME      20
+
 /* IMU */
 #define CONFIG_IMU_INT1_PIN         32
 #define CONFIG_IMU_INT2_PIN         33
 
 /* I2C */
-#define CONFIG_MCU_SDA_PIN          32
-#define CONFIG_MCU_SCL_PIN          33
+#define CONFIG_MCU_SDA_PIN          21
+#define CONFIG_MCU_SCL_PIN          22
+
+/* Capacitive touch: silkscreen T_IRQ/T_SDI/T_CS/T_CLK = INT/SDA/RST/SCL */
+#define CONFIG_TOUCH_INT_PIN        25
+#define CONFIG_TOUCH_RST_PIN        33
+#define CONFIG_TOUCH_SWAP_XY        0
+#define CONFIG_TOUCH_INVERT_X       0
+#define CONFIG_TOUCH_INVERT_Y       0
 
 /* Encoder */
 #define CONFIG_ENCODER_B_PIN        34

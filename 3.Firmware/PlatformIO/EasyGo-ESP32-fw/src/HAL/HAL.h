@@ -23,6 +23,10 @@ namespace HAL
 /* I2C */
     void I2C_Init(bool startScan);
 
+/* Capacitive touch */
+    bool Touch_Init();
+    bool Touch_GetPoint(uint16_t* x, uint16_t* y);
+
 /* IMU */
     void IMU_Init();
     void IMU_Update();

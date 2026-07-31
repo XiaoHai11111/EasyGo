@@ -24,9 +24,9 @@
  *********************/
 #ifndef LV_FS_PC_PATH
 # ifndef WIN32
-#  define LV_FS_PC_PATH "../../../../" /*Projet root*/
+#  define LV_FS_PC_PATH "." /*Simulator root selected during startup*/
 # else
-#  define LV_FS_PC_PATH "../../../../" /*Projet root*/
+#  define LV_FS_PC_PATH "." /*Simulator root selected during startup*/
 # endif
 #endif /*LV_FS_PATH*/
 

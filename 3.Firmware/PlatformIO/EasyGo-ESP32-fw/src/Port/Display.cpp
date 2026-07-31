@@ -24,6 +24,7 @@
 #include "HAL/HAL.h"
 
 TaskHandle_t handleTaskLvgl;
+
 void TaskLvglUpdate(void* parameter)
 {
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
@@ -31,33 +32,37 @@ void TaskLvglUpdate(void* parameter)
     for (;;)
     {
         lv_task_handler();
-
         delay(5);
     }
 }
 
-
-/**
-  * @brief  显示初始化
-  * @param  无
-  * @retval 无
-  */
 void Port_Init()
 {
     static SCREEN_CLASS screen;
 
-    /* 屏幕初始化 */
     screen.begin();
-    screen.setRotation(0);
+    screen.setRotation(CONFIG_SCREEN_ROTATION);
+    Serial.printf(
+        "Display: ST7789 %d x %d, rotation=%d\r\n",
+        screen.width(),
+        screen.height(),
+        CONFIG_SCREEN_ROTATION);
+
+#if CONFIG_SCREEN_SELF_TEST
+    screen.fillScreen(TFT_RED);
+    delay(120);
+    screen.fillScreen(TFT_GREEN);
+    delay(120);
+    screen.fillScreen(TFT_BLUE);
+    delay(120);
+#endif
     screen.fillScreen(TFT_BLACK);
 
-    /* lvgl初始化 */
     lv_init();
     lv_port_disp_init(&screen);
     lv_port_indev_init();
     lv_fs_if_init();
 
-    // Update display in parallel thread.
     xTaskCreate(
         TaskLvglUpdate,
         "LvglThread",
@@ -66,6 +71,5 @@ void Port_Init()
         configMAX_PRIORITIES - 1,
         &handleTaskLvgl);
 
-    /* 背光渐亮 */
     HAL::Backlight_SetGradual(500, 1000);
 }

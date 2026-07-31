@@ -43,7 +43,11 @@ bool HAL::SD_Init()
 
 bool HAL::SD_GetReady()
 {
+#if CONFIG_ENABLE_SD_CARD
     return !digitalRead(CONFIG_SD_DET_PIN);
+#else
+    return false;
+#endif
 }
 
 float HAL::SD_GetCardSizeMB()

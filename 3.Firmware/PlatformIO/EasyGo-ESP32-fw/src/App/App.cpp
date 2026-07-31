@@ -26,7 +26,6 @@
 #include "Accounts/Account_Master.h"
 #include "Resources/ResourcePool.h"
 #include "Pages/AppFactory.h"
-#include "Pages/StatusBar/StatusBar.h"
 
 void App_Init()
 {
@@ -37,17 +36,13 @@ void App_Init()
     Resource.Init();
 
     /*----------------------- Pages Init -----------------------*/
-    StatusBar::Init(lv_layer_top());
-
-    manager.Install("Template", "Pages/Template");
-    manager.Install("SystemInfos", "Pages/SystemInfos");
     manager.Install("Startup", "Pages/Startup");
-    manager.Install("Scene3D", "Pages/Scene3D");
-    manager.Install("DummyHome", "Pages/DummyHome");
-    manager.Install("Ctrl", "Pages/Ctrl");
-    manager.Install("Teach", "Pages/Teach");
+    manager.Install("Home", "Pages/Home");
+    manager.Install("Navigation", "Pages/Navigation");
+    manager.Install("Family", "Pages/Family");
+    manager.Install("Setting", "Pages/Setting");
 
-    manager.SetGlobalLoadAnimType(PageManager::LOAD_ANIM_OVER_TOP, 500);
+    manager.SetGlobalLoadAnimType(PageManager::LOAD_ANIM_OVER_RIGHT, 260);
     manager.Push("Pages/Startup");
 
     ACCOUNT_SEND_NOTIFY_CMD(Storage, STORAGE_CMD_LOAD);

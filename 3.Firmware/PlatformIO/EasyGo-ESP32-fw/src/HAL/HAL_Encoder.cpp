@@ -13,15 +13,14 @@ Account* actEncoder;
 static void Encoder_IrqHandler()
 {
     if (!EncoderEnable || EncoderDiffDisable)
-    {
         return;
-    }
 
     static volatile int count, countLast;
     static volatile uint8_t a0, b0;
     static volatile uint8_t ab0;
-    uint8_t a = digitalRead(CONFIG_ENCODER_A_PIN);
-    uint8_t b = digitalRead(CONFIG_ENCODER_B_PIN);
+    const uint8_t a = digitalRead(CONFIG_ENCODER_A_PIN);
+    const uint8_t b = digitalRead(CONFIG_ENCODER_B_PIN);
+
     if (a != a0)
     {
         a0 = a;
@@ -30,9 +29,7 @@ static void Encoder_IrqHandler()
             b0 = b;
             count += ((a == b) ? 1 : -1);
             if ((a == b) != ab0)
-            {
                 count += ((a == b) ? 1 : -1);
-            }
             ab0 = (a == b);
         }
     }
@@ -50,11 +47,13 @@ static void Encoder_PushHandler(ButtonEvent* btn, int event)
     {
         HAL::Buzz_Tone(500, 20);
         EncoderDiffDisable = true;
-    } else if (event == ButtonEvent::EVENT_RELEASED)
+    }
+    else if (event == ButtonEvent::EVENT_RELEASED)
     {
         HAL::Buzz_Tone(700, 20);
         EncoderDiffDisable = false;
-    } else if (event == ButtonEvent::EVENT_LONG_PRESSED)
+    }
+    else if (event == ButtonEvent::EVENT_LONG_PRESSED)
     {
         HAL::Audio_PlayMusic("Shutdown");
         HAL::Power_Shutdown();
@@ -64,8 +63,7 @@ static void Encoder_PushHandler(ButtonEvent* btn, int event)
 static void Encoder_RotateHandler(int16_t diff)
 {
     HAL::Buzz_Tone(300, 5);
-
-    actEncoder->Commit((const void*) &diff, sizeof(int16_t));
+    actEncoder->Commit((const void*)&diff, sizeof(int16_t));
     actEncoder->Publish();
 }
 
@@ -76,12 +74,8 @@ void HAL::Encoder_Init()
     pinMode(CONFIG_ENCODER_PUSH_PIN, INPUT_PULLUP);
 
     attachInterrupt(CONFIG_ENCODER_A_PIN, Encoder_IrqHandler, CHANGE);
-
     EncoderPush.EventAttach(Encoder_PushHandler);
-
-
     actEncoder = new Account("Encoder", AccountSystem::Broker(), sizeof(int16_t), nullptr);
-
 }
 
 void HAL::Encoder_Update()
@@ -91,25 +85,30 @@ void HAL::Encoder_Update()
 
 int16_t HAL::Encoder_GetDiff()
 {
-    int16_t diff = -EncoderDiff / 2;
+#if !CONFIG_ENABLE_ENCODER
+    return 0;
+#else
+    const int16_t diff = -EncoderDiff / 2;
     if (diff != 0)
     {
-        // EncoderDiff是实际的脉冲数；把本次变量用掉了，需要重新置0
+        /* Consume the accumulated pulse delta after publishing it. */
         EncoderDiff = 0;
         Encoder_RotateHandler(diff);
     }
-
     return diff;
+#endif
 }
 
 bool HAL::Encoder_GetIsPush()
 {
+#if !CONFIG_ENABLE_ENCODER
+    return false;
+#else
     if (!EncoderEnable)
-    {
         return false;
-    }
 
-    return (digitalRead(CONFIG_ENCODER_PUSH_PIN) == LOW);
+    return digitalRead(CONFIG_ENCODER_PUSH_PIN) == LOW;
+#endif
 }
 
 void HAL::Encoder_SetEnable(bool en)

@@ -33,7 +33,7 @@
   <Import Project="Mile.Project\Mile.Project.Cpp.props" />
   <Import Project="Mile.Project\Mile.Project.Cpp.VC-LTL.props" />
   <PropertyGroup>
-    <IncludePath>$(ProjectDir)..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Teach;$(ProjectDir)..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Ctrl;$(ProjectDir)..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Scene3D;$(ProjectDir)..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\DummyHome;$(MSBuildThisFileDirectory);$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Family;$(ProjectDir)..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Navigation;$(ProjectDir)..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Setting;$(ProjectDir)..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Home;$(MSBuildThisFileDirectory);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <LinkIncremental>false</LinkIncremental>
@@ -68,20 +68,21 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Ctrl\Ctrl.h" />
-    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Ctrl\CtrlModel.h" />
-    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Ctrl\CtrlView.h" />
-    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\DummyHome\DummyHome.h" />
-    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\DummyHome\DummyHomeModel.h" />
-    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\DummyHome\DummyHomeView.h" />
+    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Navigation\Navigation.h" />
+    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Navigation\NavigationModel.h" />
+    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Navigation\NavigationView.h" />
+    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Home\Home.h" />
+    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Home\HomeModel.h" />
+    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Home\HomeView.h" />
+    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Common\EasyGoUi.h" />
     <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Scene3D\mesh_cube.h" />
     <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Scene3D\Scene3D.h" />
     <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Scene3D\Scene3DModel.h" />
     <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Scene3D\Scene3DView.h" />
     <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Scene3D\type.h" />
-    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Teach\Teach.h" />
-    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Teach\TeachModel.h" />
-    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Teach\TeachView.h" />
+    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Family\Family.h" />
+    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Family\FamilyModel.h" />
+    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Family\FamilyView.h" />
     <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\lib\ArduinoJson\src\ArduinoJson.h" />
     <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\lib\ArduinoJson\src\ArduinoJson.hpp" />
     <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Accounts\Account_Master.h" />
@@ -93,9 +94,9 @@
     <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\StartUp\StartUpModel.h" />
     <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\StartUp\StartUpView.h" />
     <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\StatusBar\StatusBar.h" />
-    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\SystemInfos\SystemInfos.h" />
-    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\SystemInfos\SystemInfosModel.h" />
-    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\SystemInfos\SystemInfosView.h" />
+    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Setting\Setting.h" />
+    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Setting\SettingModel.h" />
+    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Setting\SettingView.h" />
     <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\_Template\Template.h" />
     <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\_Template\TemplateModel.h" />
     <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\_Template\TemplateView.h" />
@@ -259,18 +260,18 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Accounts\ACT_BT.cpp" />
-    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Ctrl\Ctrl.cpp" />
-    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Ctrl\CtrlModel.cpp" />
-    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Ctrl\CtrlView.cpp" />
-    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\DummyHome\DummyHome.cpp" />
-    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\DummyHome\DummyHomeModel.cpp" />
-    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\DummyHome\DummyHomeView.cpp" />
+    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Navigation\Navigation.cpp" />
+    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Navigation\NavigationModel.cpp" />
+    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Navigation\NavigationView.cpp" />
+    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Home\Home.cpp" />
+    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Home\HomeModel.cpp" />
+    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Home\HomeView.cpp" />
     <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Scene3D\Scene3D.cpp" />
     <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Scene3D\Scene3DModel.cpp" />
     <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Scene3D\Scene3DView.cpp" />
-    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Teach\Teach.cpp" />
-    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Teach\TeachModel.cpp" />
-    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Teach\TeachView.cpp" />
+    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Family\Family.cpp" />
+    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Family\FamilyModel.cpp" />
+    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Family\FamilyView.cpp" />
     <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Resources\Image\img_src_arm.c" />
     <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Resources\Image\img_src_back.c" />
     <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Resources\Image\img_src_ctrl.c" />
@@ -292,9 +293,9 @@
     <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\StartUp\StartUpModel.cpp" />
     <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\StartUp\StartUpView.cpp" />
     <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\StatusBar\StatusBar.cpp" />
-    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\SystemInfos\SystemInfos.cpp" />
-    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\SystemInfos\SystemInfosModel.cpp" />
-    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\SystemInfos\SystemInfosView.cpp" />
+    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Setting\Setting.cpp" />
+    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Setting\SettingModel.cpp" />
+    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Setting\SettingView.cpp" />
     <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\_Template\Template.cpp" />
     <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\_Template\TemplateModel.cpp" />
     <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\_Template\TemplateView.cpp" />
@@ -303,6 +304,11 @@
     <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Resources\Font\font_bahnschrift_17.c" />
     <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Resources\Font\font_bahnschrift_32.c" />
     <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Resources\Font\font_bahnschrift_65.c" />
+    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Resources\Font\font_easygo_12.c" />
+    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Resources\Font\font_easygo_14.c" />
+    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Resources\Font\font_easygo_16.c" />
+    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Resources\Font\font_easygo_20.c" />
+    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Resources\Font\font_easygo_28.c" />
     <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Resources\Image\img_src_alarm.c" />
     <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Resources\Image\img_src_bicycle.c" />
     <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Resources\Image\img_src_compass.c" />

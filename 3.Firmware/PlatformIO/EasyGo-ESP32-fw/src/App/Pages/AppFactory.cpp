@@ -21,13 +21,11 @@
  * SOFTWARE.
  */
 #include "AppFactory.h"
-#include "_Template/Template.h"
-#include "SystemInfos/SystemInfos.h"
 #include "StartUp/StartUp.h"
-#include "Scene3D/Scene3D.h"
-#include "DummyHome/DummyHome.h"
-#include "Ctrl/Ctrl.h"
-#include "Teach/Teach.h"
+#include "Home/Home.h"
+#include "Navigation/Navigation.h"
+#include "Family/Family.h"
+#include "Setting/Setting.h"
 
 #define APP_CLASS_MATCH(className)\
 do{\
@@ -39,13 +37,11 @@ do{\
 
 PageBase* AppFactory::CreatePage(const char* name)
 {
-    APP_CLASS_MATCH(Template);
-    APP_CLASS_MATCH(SystemInfos);
     APP_CLASS_MATCH(Startup);
-    APP_CLASS_MATCH(Scene3D);
-    APP_CLASS_MATCH(DummyHome);
-    APP_CLASS_MATCH(Ctrl);
-    APP_CLASS_MATCH(Teach);
+    APP_CLASS_MATCH(Home);
+    APP_CLASS_MATCH(Navigation);
+    APP_CLASS_MATCH(Family);
+    APP_CLASS_MATCH(Setting);
 
     return nullptr;
 }

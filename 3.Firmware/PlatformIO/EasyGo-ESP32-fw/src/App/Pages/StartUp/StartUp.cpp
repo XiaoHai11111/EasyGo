@@ -2,14 +2,8 @@
 
 using namespace Page;
 
-Startup::Startup()
-{
-}
-
-Startup::~Startup()
-{
-
-}
+Startup::Startup() : timer(nullptr) {}
+Startup::~Startup() {}
 
 void Startup::onCustomAttrConfig()
 {
@@ -22,45 +16,34 @@ void Startup::onViewLoad()
     Model.Init();
     Model.SetEncoderEnable(false);
     View.Create(root);
-    lv_timer_t* timer = lv_timer_create(onTimer, 2000, this);
+    timer = lv_timer_create(onTimer, 2200, this);
     lv_timer_set_repeat_count(timer, 1);
-}
-
-void Startup::onViewDidLoad()
-{
-    lv_obj_fade_out(root, 300, 1500);
-}
-
-void Startup::onViewWillAppear()
-{
-    lv_anim_timeline_start(View.ui.anim_timeline);
-}
-
-void Startup::onViewDidAppear()
-{
-
-}
-
-void Startup::onViewWillDisappear()
-{
-
-}
-
-void Startup::onViewDidDisappear()
-{
-    StatusBar::Appear(true);
-}
-
-void Startup::onViewDidUnload()
-{
-    View.Delete();
-    Model.SetEncoderEnable(true);
-    Model.DeInit();
 }
 
 void Startup::onTimer(lv_timer_t* timer)
 {
-    Startup* instance = (Startup*)timer->user_data;
+    Startup* instance = static_cast<Startup*>(timer->user_data);
+    instance->timer = nullptr;
+    instance->Manager->Push("Pages/Home");
+}
 
-    instance->Manager->Push("Pages/DummyHome");
+void Startup::onViewDidLoad() {}
+void Startup::onViewWillAppear()
+{
+    lv_anim_timeline_start(View.ui.anim_timeline);
+}
+void Startup::onViewDidAppear() {}
+void Startup::onViewWillDisappear() {}
+void Startup::onViewDidDisappear() {}
+void Startup::onViewUnload() {}
+void Startup::onViewDidUnload()
+{
+    if (timer != nullptr)
+    {
+        lv_timer_del(timer);
+        timer = nullptr;
+    }
+    View.Delete();
+    Model.SetEncoderEnable(true);
+    Model.DeInit();
 }

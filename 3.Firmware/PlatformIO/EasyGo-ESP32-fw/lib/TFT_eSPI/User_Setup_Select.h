@@ -49,7 +49,8 @@
 //#include <User_Setups/Setup22_TTGO_T4.h>           // Setup file for ESP32 and TTGO T4 version 1.2
 //#include <User_Setups/Setup22_TTGO_T4_v1.3.h>      // Setup file for ESP32 and TTGO T4 version 1.3
 //#include <User_Setups/Setup23_TTGO_TM.h>           // Setup file for ESP32 and TTGO TM ST7789 SPI bus TFT
-#include <User_Setups/Setup24_ST7789.h>            // Setup file configured for ST7789 240 x 240
+//#include <User_Setups/Setup24_ST7789.h>            // Setup file configured for ST7789 240 x 240
+#include <User_Setups/Setup_EasyGo_ESP32_ST7789_240x320.h> // EasyGo ESP32 Dev Module + ST7789
 //#include <User_Setups/Setup25_TTGO_T_Display.h>    // Setup file for ESP32 and TTGO T-Display ST7789V SPI bus TFT
 //#include <User_Setups/Setup26_TTGO_T_Wristband.h>  // Setup file for ESP32 and TTGO T-Wristband ST7735 SPI bus TFT
 

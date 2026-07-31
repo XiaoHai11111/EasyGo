@@ -29,7 +29,42 @@
 4. 在 `ResourcePool.cpp` 中注册页面使用的全部图片和字体资源。
 5. 确认资源源文件及页面源文件同时存在于 `.vcxproj` 和 `.vcxproj.filters`。
 
-当前启动链路为 `Startup -> DummyHome`。DummyHome 的三个入口分别进入 `Ctrl`、`Teach` 和 `SystemInfos`。
+当前启动链路为 `Startup -> Home`。Home 的三个入口分别进入 `Navigation`、`Family` 和 `Setting`。这些页面继续使用 `Page / View / Model / ResourcePool` 架构，旧的 `DummyHome/Ctrl/Teach/SystemInfos` 名称不再参与工程。
+
+## 分辨率、字体与模拟 SD 卡
+
+- 固件 `CONFIG_SCREEN_HOR_RES/VER_RES` 和 Windows 窗口均为 `240×320`。
+- EasyGo 中文字体子集由 `4.Software/UI/tools/build_lvgl_assets.py` 从本机 Microsoft YaHei 生成，输出为 `font_easygo_12/14/16/20/28.c`。
+- 字体脚本必须使用与 `getbbox(anchor="ls")` 相同的基线锚点绘制字形；否则生成的位图会透明而只留下页面图标。
+- 模拟 SD 卡根目录为 `4.Software/Simulator/SD/`。启动器从 EXE 所在目录向上查找 `SD/MAP/shenzhen.bin`，找到后设置工作目录，再由 LVGL 路径 `/SD/MAP/shenzhen.bin` 加载。
+- 当前地图是深圳市宝安区 OSM 原始数据的本地渲染，来源、范围、日期、许可和用途限制见 `4.Software/Simulator/SD/MAP/ATTRIBUTION.md`；二进制格式见 `4.Software/Simulator/SD/MAP/MAP_FORMAT.md`。
+- 联系人仿真文件为 `4.Software/Simulator/SD/CONTACTS/contacts.csv`，每行格式是 `姓名,脱敏号码,头像样式编号`。PC 使用 `/SD/CONTACTS/contacts.csv`，实体 SD 卡放在 `/CONTACTS/contacts.csv` 并通过 `S:/CONTACTS/contacts.csv` 读取。
+- FamilyModel 最多读取 16 条联系人；空行和 `#` 注释会被忽略，文件不存在或没有有效记录时使用内置的 3 条脱敏演示联系人。
+
+### SD 路径映射
+
+| 数据 | PC 宿主文件 | PC LVGL 路径 | 实体 SD 卡位置 | 固件 LVGL 路径 |
+| --- | --- | --- | --- | --- |
+| 宝安区地图 | `4.Software/Simulator/SD/MAP/shenzhen.bin` | `/SD/MAP/shenzhen.bin` | `/MAP/shenzhen.bin` | `S:/MAP/shenzhen.bin` |
+| 地图层级索引 | `4.Software/Simulator/SD/MAP/shenzhen_levels.bin` | `/SD/MAP/shenzhen_levels.bin` | `/MAP/shenzhen_levels.bin` | `S:/MAP/shenzhen_levels.bin` |
+| 宝安区厕所 POI | `4.Software/Simulator/SD/MAP/shenzhen_toilets.bin` | `/SD/MAP/shenzhen_toilets.bin` | `/MAP/shenzhen_toilets.bin` | `S:/MAP/shenzhen_toilets.bin` |
+| 联系人 | `4.Software/Simulator/SD/CONTACTS/contacts.csv` | `/SD/CONTACTS/contacts.csv` | `/CONTACTS/contacts.csv` | `S:/CONTACTS/contacts.csv` |
+
+不要把 PC 宿主目录中的 `SD` 文件夹名称复制到实体卡根目录。使用 `_WIN32` 或统一存储适配层选择路径，避免在 View 中拼接平台路径。
+
+### 地图与厕所 POI 数据边界
+
+- `shenzhen.bin` 是供 LVGL 显示的 RGB565 像素数据，不包含可供运行时搜索的 POI 结构。
+- `shenzhen_baoan.osm.json` 是当前宝安区地图与 POI 的 OSM 原始快照，包含主要道路以及 89 个 `amenity=toilets` 对象。
+- `shenzhen_toilets.bin` 是适合 MCU 顺序读取的定长 POI 索引，保存 OSM 标识、WGS84 经纬度、对象类型、名称和有限属性；头部、记录、比例尺与 CRC32 见 `MAP_FORMAT.md`。
+- 当前固件尚未接入 POI 索引查询；文件存在和格式正确不等同于附近厕所搜索已经完成。
+- 地图缩放使用 1×、2×、4×、8×、16×、32×、64× 七个 720×492 RGB565 大画布层级；`shenzhen.bin` 是默认 8×，`shenzhen_z3.bin` 是其相同内容别名。按钮通过 Model 选择平台路径并让 View 切换图片源。
+- 地图显示区是 240×164 的双向滚动视口，初始滚动到 `(240, 164)`。底图、路线、当前位置和厕所目标位于同一个 720×492 内容层并随触摸拖动；右侧缩放按钮、行政区标签和 OSM 署名位于根层并保持固定。
+- `shenzhen_levels.bin` 使用 `EGMAPL2` 版本 2 头部，记录画布/视口尺寸、24 像素画布内容边距、初始滚动位置、七级 WGS84 边界、米/像素和 CRC32。当前模拟焦点是 `(22.5533410, 113.8782710)`；最大 64× 层级约为横向 2.1 米/像素、纵向 4.0 米/像素。
+- 不要对当前文件源调用 `lv_img_set_zoom()`。内置解码器按行读取 `.bin`，变换代码却需要完整图片缓冲，会导致地图透明或消失；若未来改为内存图片，先验证约 692 KiB 单级图片数据及变换开销在目标硬件上的连续内存预算。
+- PC 鼠标拖动由 Windows 指针输入模拟触摸。真机要获得相同行为，必须在 LVGL 中注册并校准 `LV_INDEV_TYPE_POINTER` 触摸设备；只有编码器输入时页面不会响应触摸拖动。
+- 查询结果必须区分直线距离、道路距离和步行时间。当前固定的 `120 米`、`约 2 分钟` 与路线仅用于界面演示。
+- 保留 `ATTRIBUTION.md`，更新地图或 POI 数据时同步记录范围、来源、许可、抓取日期和生成方式。
 
 ## 账户初始化
 
@@ -48,10 +83,24 @@
 
 若解决方案正被 Visual Studio 打开，外部 MSBuild 可能因中间文件被占用而无法清理默认 `Output/`。优先在当前 Visual Studio 实例中构建，或关闭占用后再从命令行构建。
 
-## 2026-07-26 验证记录
+## 2026-07-29 验证记录
 
-- `Debug|x64` 独立输出构建通过。
-- 启动动画结束后进入 DummyHome，三个按钮及其图标正常显示。
-- Ctrl、Teach、SystemInfos 三个入口均完成实际点击验证。
-- Ctrl 返回按钮与 Teach 画布返回操作可以回到 DummyHome。
+- `Debug|x64` 构建通过，输出为 `4.Software/Simulator/Output/Debug/x64/LVGL.Simulator.exe`。
+- 启动页、Home、Navigation、Family、Setting 均完成实际窗口截图检查，中文、背景和图标正常显示。
+- Navigation 已验证模拟 SD 地图、路线、厕所目标、当前位置、放大/缩小和返回。
+- 宝安区地图已验证为 240×174 RGB565 LVGL 文件；厕所索引已验证包含 89 条记录，文件尺寸、WGS84 边界和 CRC32 均正确。
+- Family 已验证三个演示联系人、模拟呼叫与演示求助；不会拨号、发消息或传输位置。
+- Family 已进一步验证从 SD CSV 动态加载 8 条联系人、自动生成卡片以及纵向滚动条；顶部标题和底部 SOS 固定不滚动。
+- Setting 已验证语音开关和返回首页。
+- 地图中的距离、预计时间和线路为固定演示数据，不作为路线正确性或安全性验证。
 - 运行期间未再触发 `Account::Commit()` 的空 `this` 异常。
+
+## 2026-07-30 验证记录
+
+- 修复 SD 文件源调用 `lv_img_set_zoom()` 后地图消失的问题，改为五级离线地图文件切换。
+- `Debug|x64` 重新构建通过。
+- 在实际模拟器窗口中从默认层级连续放大到最大、缩小到最小，并在最小层级额外点击缩小；各层级地图均持续显示且比例变化可见。
+- 原五级 0.84×–1.36× 方案因总跨度仅约 1.62 倍而废止；已替换为 1×–64× 七级方案，并再次完成实际窗口逐级放大、逐级缩小验证。
+- `shenzhen_levels.bin` 已验证头部、七条记录、文件长度和 CRC32；固件 Model 提供同边界的 WGS84 E7 到屏幕像素投影方法。
+- 地图资源已扩展为 720×492 大画布，地图视口支持双向拖动且边界受限；实际窗口已验证拖动时底图、路线和标记整体移动，固定缩放按钮不随地图移动。
+- 拖动后点击放大仍能正常切换文件并保持地图显示；`Debug|x64` 与 ESP32 `esp32dev` 构建均通过。2026-07-31 的 ESP32 Dev Module 构建资源占用为 RAM 9.6%、Flash 62.1%。
