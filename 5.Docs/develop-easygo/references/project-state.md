@@ -1,10 +1,10 @@
 # EasyGo 项目状态
 
-最近更新：2026-07-31
+最近更新：2026-08-02
 
 ## 当前阶段
 
-项目已进入 240×320 适老 UI、PC 仿真和 ESP32 Dev Module + ST7789 真机点亮准备阶段。当前已完成启动、首页、寻厕导航、亲情守护和设置五类页面，以及模拟 SD 卡深圳地图显示；具体产品形态、系统架构、量产器件选型、生产地图/路线服务、定位与通信方案仍未定型。
+项目已进入 GPS、4G、DFPlayer、双按键与 240×320 适老 UI 联调阶段。当前已完成发布订阅业务状态机、最近厕所离线索引、寻厕/回家/SOS 交互、设备状态页和 Windows PC 仿真；IMU、地磁计与独立数据 SD 尚未接入实体硬件，道路级路线和生产服务仍未定型。
 
 ## 已确认事实
 
@@ -17,37 +17,45 @@
 | 目录 | 使用 `0.References/` 至 `5.Docs/` 的分层结构 | 当前工作区 |
 | 参考资料 | 已有 FS-MCore-A7670CX 与 A7670/A7600 系列规格、硬件、AT 命令及应用资料 | `0.References/81078/资料/` |
 | 固件 | ESP32 PlatformIO 固件位于 `3.Firmware/PlatformIO/EasyGo-ESP32-fw/` | 当前工作区，2026-07-26 |
-| 固件构建 | 在固件目录执行 `C:\Users\24302\.platformio\penv\Scripts\platformio.exe run -e esp32dev`；成功产物位于 `.pio/build/esp32dev/`。2026-07-31 构建 RAM 9.6%、Flash 62.1% | `platformio.ini` 与实际构建成功记录，2026-07-31 |
+| 固件构建 | 在固件目录执行 `C:\Users\24302\.platformio\penv\Scripts\platformio.exe run -e esp32dev`；成功产物位于 `.pio/build/esp32dev/`。2026-08-02 最终构建 RAM 12.9%、Flash 84.2% | `platformio.ini` 与实际构建成功记录，2026-08-02 |
 | 固件协作环境 | 已把 Windows x64 下构建 `esp32dev` 所需的 Espressif 32 6.9.0、Arduino-ESP32 2.0.17、Xtensa 工具链和烧录/文件系统工具封装到 `0.References/PlatformIO-ESP32-6.9.0-Windows-x64.zip`，包内附安装说明及 SHA-256 | 本机已安装包、归档完整性与隔离安装验证，2026-07-31 |
-| 显示与触摸适配 | ESP32 Dev Module + ST7789 240×320 已在实体板显示完整 UI：VSPI GPIO18/19/23，CS5、DC27、RST16；该屏采用 `TFT_BGR` 且关闭颜色反相。I²C 电容触摸使用 SDA21、SCL22、INT25、RST33，并有限识别 FT6x36/CST816/GT911；触摸控制器仍待实体板确认 | 实屏照片、`Config.h`、TFT_eSPI 项目设置、`HAL_Touch.cpp`、构建记录，2026-07-31 |
-| DFPlayer 音频 | DFPlayer Mini 通过 UART2 接入：ESP32 TX17→DFPlayer RX（串 1kΩ）、ESP32 RX26←DFPlayer TX、BUSY34；固件将 11 个提示音映射为 `/mp3/0001.mp3`～`0011.mp3`。代码已编译，尚未在实体模块播放验证 | `Config.h`、`HAL_Audio.cpp`、`DFPlayer-Mini-SD-Audio-Bringup.md`、构建记录，2026-07-31 |
-| 页面仿真 | `4.Software/Simulator/LVGL.Simulator.sln` 直接编译固件 `src/App/` 下的 LVGL 页面和资源；当前链路为 `Startup -> Home -> Navigation/Family/Setting`，已完成 `Debug|x64` 构建与实际点击验证 | 工程文件与运行验证，2026-07-29 |
+| 显示与触摸适配 | ESP32 Dev Module + ST7789 240×320 已在实体板显示完整 UI：VSPI GPIO18/19/23，CS5、DC27、RST16；该屏采用 `TFT_BGR` 且关闭颜色反相。I²C 电容触摸使用 SDA21、SCL22、INT25、RST33，实体板识别为 FT6x36 兼容控制器；用户已确认修复触摸问题 | 实屏照片、COM4 日志、用户确认、`Config.h`、`HAL_Touch.cpp`，2026-08-02 |
+| DFPlayer 音频 | DFPlayer Mini 通过 UART2 接入：ESP32 TX17→DFPlayer RX（串 1kΩ）、ESP32 RX26←DFPlayer TX、BUSY34；固件将 18 个提示音映射为 `/mp3/0001.mp3`～`0018.mp3`。上电等待后直接选择 TF 卡，不再发送会造成供电冲击的 `0x0C` 二次软复位；实体模块已识别 TF 卡并播放 `0001.mp3` | `Config.h`、`HAL_Audio.cpp`、COM4 日志，2026-08-02 |
+| GPS | GPIO36 使用 EspSoftwareSerial 8.2.0 单线接收 GPS TX，支持 9600/38400/115200/4800 自动探测；校验并解析 GGA/RMC，发布定位和 UTC 时间。实体模块在 9600 baud 连续收到有效 NMEA：25 秒内 5217 字节/189 句，最终连续计数达到 13151 字节/490 句；当前 `fix=no`，说明串口链路已通但尚未获得卫星定位 | `HAL_GPS.cpp`、COM4 实测日志，2026-08-02 |
+| GPS/4G 定位融合 | `Location` 账户执行 GPS 优先的位置融合；GPS 连续不可用 30 秒后，`CareGo -> Network` 异步请求 A7670 `AT+CLBS=1` 基站定位，失败重试间隔 60 秒，LBS 结果有效期 180 秒。只接受状态码为 0 且经纬度、精度范围合法的响应，不使用参考程序中的固定测试坐标；GPS 恢复后立即覆盖 LBS。固件与模拟器构建通过，实际 CLBS 返回、坐标系和精度尚未在实体模块验证 | `GPS_LBS_4G.txt`、`HAL_Cellular.cpp`、`ACT_Location.cpp`、`ACT_Network.cpp`、`ACT_CareGo.cpp`、构建记录，2026-08-02 |
+| 4G/热点 | 4G 使用 UART1 RX14/TX13、115200 baud；实体模块已注册网络，实测信号 -51 dBm，`AT+CCLK?` 网络时间有效。公网厕所 HTTP 查询仍关闭；用户已明确授权 SOS 短信功能和紧急联系人号码，固件仅在用户主动触发时发送，调试中未发送真实短信 | `HAL_Cellular.cpp`、`ACT_Network.cpp`、`Config.h`、COM4 实测日志，2026-08-02 |
+| 双按键 | 寻厕/语音键改为 GPIO32，回家/SOS 使用板载 BOOT(GPIO0)，均低有效并启用内部上拉；上电稳定释放 800ms 后才使能，单击/双击/长按由 `Input` 主题发布，LVGL 页面跳转限流并在 UI 定时器处理 | `HAL_Keys.cpp`、`ACT_Input.cpp`、`App.cpp`，2026-08-02；待烧录后实体验证 |
+| CareGO 业务 | `Location`、`Network`、`Input`、`CareGo` 与 `MusicPlayer` 通过 AccountSystem 发布订阅；已实现寻厕、回家、附近提醒、帮助语音、SOS 与设置家庭位置状态机 | `ACT_CareGo.cpp`、`CareGoClient.*`，2026-08-01 |
+| 页面仿真 | `4.Software/Simulator/LVGL.Simulator.sln` 直接编译固件 `src/App/` 下的 LVGL 页面和资源；链路为 `Startup -> Home -> Navigation/Family/Setting -> DeviceStatus`，2026-08-01 完成 `Debug|x64` 构建和首页、导航、设置、设备状态实际点击/截图验证 | 工程文件与运行验证，2026-08-01 |
+| 2026-08-02 重启修复 | 崩溃回溯定位到 Family 周期定时器在页面离场后调用 `lv_label_set_text`；所有周期刷新页现于离场前删除定时器并校验 LVGL 对象，CareGo UI 状态改为加锁快照，缺失中文字形已补齐。随后真机发现 DFPlayer `0x0C` 二次软复位触发 Brownout，取消该命令并改用外置开关电源。最终全功能固件烧录校验通过，COM4 连续监测 45 秒无 Brownout、Guru Meditation 或自动重启 | 崩溃日志、`Family.cpp`、`CareGoClient.*`、`HAL_Audio.cpp`、构建/烧录/COM4 记录，2026-08-02 |
 | UI 分辨率 | 固件配置与 Windows 仿真窗口均为 240×320 | `Config.h`、`LVGL.Simulator.cpp`，2026-07-29 |
 | 中文字体 | 使用本机 Microsoft YaHei 生成 12/14/16/20/28px LVGL 字形子集，生成脚本位于 `4.Software/UI/tools/build_lvgl_assets.py` | 字体源文件与运行截图，2026-07-29 |
-| 地图与厕所 POI 仿真 | 模拟 SD 卡资源位于 `4.Software/Simulator/SD/MAP/`；当前为深圳市宝安区 OSM 快照、1×–64× 七级 720×492 LVGL RGB565 大画布地图、WGS84 层级索引和包含 89 条记录的定长厕所 POI 索引；240×164 视口支持双向拖动，缩放通过切换同尺寸文件实现 | `ATTRIBUTION.md`、`MAP_FORMAT.md`、Overpass 查询、二进制校验及实际拖动/缩放验证，2026-07-30 |
-| 联系人仿真 | Family 页面从模拟 SD 卡 `CONTACTS/contacts.csv` 动态读取最多 16 条脱敏演示联系人，列表可纵向滚动；文件缺失时回退到 3 条内置演示数据 | Model/View 源码与实际滚动验证，2026-07-29 |
+| 地图与厕所 POI | 模拟 SD 卡资源位于 `4.Software/Simulator/SD/MAP/`；当前为深圳市宝安区 OSM 快照、1×–64× 七级地图和 89 条厕所记录。`ACT_Network` 已读取定长索引并用 WGS84 Haversine 直线距离选择最近记录，文件不可用时才回退网络 | `ACT_Network.cpp`、`MAP_FORMAT.md`、实际仿真，2026-08-01 |
+| 联系人与 SOS | Family 页面从模拟 SD 卡 `CONTACTS/contacts.csv` 动态读取最多 16 条联系人，并始终加入用户授权的紧急联系人；右侧统一使用短信信封图标。点击联系人或一键求助通过 `CareGo -> Network` 发布订阅链路发起短信；Windows 模拟器已实际点击验证受理反馈，未连接真实网络 | `FamilyModel.*`、`FamilyView.cpp`、`ACT_CareGo.cpp`、模拟器实际点击，2026-08-02 |
+| 实时状态栏与图标 | Home/Family/Navigation/Setting/DeviceStatus 状态栏显示 4G 实际信号格、4G 网络时间（GPS UTC+8 备用）、定位成功后 GPS 标识和 DFPlayer TF 卡在线时 SD 标识；启动页和 Home 共用修正后的定位图标，启动页爱心使用标准字形。模拟器 `Debug|x64` 0 错误并完成 Home/Family 实际截图与点击验证 | `EasyGoUi.h`、`StartUpView.cpp`、`HomeView.cpp`、模拟器验证，2026-08-02 |
 | 版本控制 | 当前目录已初始化为 Git 仓库 | 2026-07-29 本地检查 |
 
 ## 事实边界
 
 - A7670 系列资料的存在只证明它是当前候选参考，不证明 EasyGo 已选定具体模块、蜂窝制式、频段、认证、GNSS/LBS 能力或云协议。
-- 当前页面中的 120 米、2 分钟、路线和厕所目标均为固定仿真数据，不代表生产导航方案。
-- 当前 OSM 快照和 `shenzhen_toilets.bin` 只证明离线地图与 POI 数据准备链路可行；固件查询算法、路线来源、POI 完整性、坐标转换、更新机制、无障碍字段和生产使用方案仍未确认。
+- 最近厕所目标和直线距离已由离线索引计算；屏幕道路折线与预计步行时间仍是演示，不代表生产导航方案。
+- 当前 OSM 快照存在数据时间差和覆盖缺口，不证明厕所实时开放、无障碍、安全或可达；索引更新和生产许可策略仍未确认。
 - “电子围栏”的判定位置、告警接收者、通信渠道、精度、时延和可靠性指标尚未确认。
 - 尚未确认产品是否独立运行，或依赖手机、照护端和云服务。
 - 屏幕照片只能确认转接板接口定义，不能确认电容触摸 IC 型号、I²C 地址、坐标方向或 LED 板载限流；必须通过实体板丝印、串口探测和上电测试确认。
 - DFPlayer 自带 microSD 只用于模块音频解码，不能替代 ESP32 用于地图、联系人和系统配置的独立 SPI 数据卡。
+- `AT+CLBS=1` 的返回目前按参考程序解释为纬度、经度、精度（并兼容经纬度顺序互换）；在模块手册和实测确认前，不把其坐标系、可用区域、精度、时延或资费写成已验证事实。
 
 ## 待确认
 
 - 产品形态：随身挂件、手持设备、腕带或其他形态，以及尺寸、质量、成本和防护目标。
 - 用户与照护关系：老人独立使用流程、照护人角色、绑定、授权、解除绑定和人工求助路径。
-- 交互：按键、显示、语音、蜂鸣、振动、指示灯及适老可用性要求。
+- 交互：双按键基础映射已经确认；长按用途、振动、指示灯及适老可用性验收仍待确认。
 - 厕所 POI：目标地区、数据源、许可、覆盖率、更新方式、开放时间、无障碍字段和离线策略。
 - 导航：直线方向提示或道路路线、偏航重算、室内场景、坐标系和到达判定。
-- 定位：GNSS、蜂窝 LBS、Wi-Fi、BLE、手机辅助或融合方案，以及冷启动、精度和功耗指标。
+- 定位：GPS 优先、蜂窝 LBS 回退的软件链路已实现；仍需确认 CLBS 坐标系、服务可用区域、冷启动、精度、时延、流量/资费和功耗指标，以及是否加入 Wi-Fi、BLE 或手机辅助。
 - 围栏：形状、半径、边界规则、采样周期、迟滞、连续判定、误报/漏报和告警时延。
-- 通信：蜂窝、BLE、Wi-Fi、短信、电话、数据连接、协议、服务端和资费约束。
+- 通信：热点优先/4G 回退和 SMS 方向已确认；具体 4G 固件 AT 兼容性、生产协议、鉴权、TLS、资费和到达确认仍待确认。
 - 硬件：当前实验主控为 ESP32 Dev Module、实验屏为 ST7789 240×320；量产主控、触摸 IC、通信/定位模块、天线、电池、充电、电源、音频、振动、按键和传感器仍待确认。
 - 固件与软件：RTOS、工具链、升级、设备协议、移动端、照护端、服务端和数据管理。
 - 隐私与合规：同意方式、位置共享、数据最小化、保留与删除、访问控制、目标销售地区法规和产品认证。

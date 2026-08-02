@@ -22,8 +22,10 @@ public:
 
 private:
     static void onEvent(lv_event_t* event);
+    static void onRefresh(lv_timer_t* timer);
     void Attach(lv_obj_t* object);
     FamilyView View;
     FamilyModel Model;
+    lv_timer_t* refreshTimer;
 };
 }

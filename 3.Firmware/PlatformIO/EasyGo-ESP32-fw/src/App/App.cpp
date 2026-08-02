@@ -27,12 +27,58 @@
 #include "Resources/ResourcePool.h"
 #include "Pages/AppFactory.h"
 
+namespace
+{
+PageManager* g_pageManager = nullptr;
+Account* g_inputRouter = nullptr;
+volatile AccountSystem::Input_Action_t g_pendingAction = AccountSystem::INPUT_NONE;
+uint32_t g_lastInputRouteAt = 0;
+
+int onInputEvent(Account*, Account::EventParam_t* param)
+{
+    if (!param || param->event != Account::EVENT_PUB_PUBLISH)
+        return Account::ERROR_UNSUPPORTED_REQUEST;
+    if (param->size != sizeof(AccountSystem::Input_Info_t))
+        return Account::ERROR_SIZE_MISMATCH;
+    const AccountSystem::Input_Info_t* input =
+        static_cast<const AccountSystem::Input_Info_t*>(param->data_p);
+    g_pendingAction = input->action;
+    return Account::ERROR_NONE;
+}
+
+void onInputRoute(lv_timer_t*)
+{
+    const AccountSystem::Input_Action_t action = g_pendingAction;
+    g_pendingAction = AccountSystem::INPUT_NONE;
+    if (!g_pageManager) return;
+    const uint32_t now = lv_tick_get();
+    if (now < 3000 || action == AccountSystem::INPUT_NONE) return;
+    if (g_lastInputRouteAt != 0 && now - g_lastInputRouteAt < 700) return;
+
+    PageBase* routed = nullptr;
+    if (action == AccountSystem::INPUT_TOILET_CLICK ||
+        action == AccountSystem::INPUT_HOME_CLICK)
+        routed = g_pageManager->Push("Pages/Navigation");
+    else if (action == AccountSystem::INPUT_SOS_DOUBLE_CLICK)
+        routed = g_pageManager->Push("Pages/Family");
+    if (routed) g_lastInputRouteAt = now;
+}
+}
+
 void App_Init()
 {
     static AppFactory factory;
     static PageManager manager(&factory);
+    g_pageManager = &manager;
 
     Accounts_Init();
+    g_inputRouter = new Account("AppInputRouter", AccountSystem::Broker());
+    if (g_inputRouter)
+    {
+        g_inputRouter->SetEventCallback(onInputEvent);
+        g_inputRouter->Subscribe("Input");
+    }
+    lv_timer_create(onInputRoute, 100, nullptr);
     Resource.Init();
 
     /*----------------------- Pages Init -----------------------*/
@@ -41,6 +87,7 @@ void App_Init()
     manager.Install("Navigation", "Pages/Navigation");
     manager.Install("Family", "Pages/Family");
     manager.Install("Setting", "Pages/Setting");
+    manager.Install("DeviceStatus", "Pages/DeviceStatus");
 
     manager.SetGlobalLoadAnimType(PageManager::LOAD_ANIM_OVER_RIGHT, 260);
     manager.Push("Pages/Startup");

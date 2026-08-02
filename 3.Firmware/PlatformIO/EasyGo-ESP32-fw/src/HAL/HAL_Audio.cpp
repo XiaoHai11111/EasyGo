@@ -11,7 +11,6 @@ enum class InitState
 {
     Disabled,
     WaitForPower,
-    WaitAfterReset,
     WaitAfterDeviceSelect,
     Ready
 };
@@ -34,7 +33,14 @@ const TrackMapping tracks[] =
     {"BattChargeEnd", 8},
     {"DeviceInsert", 9},
     {"DevicePullout", 10},
-    {"NoOperationWarning", 11}
+    {"NoOperationWarning", 11},
+    {"HelpMandarin", 12},
+    {"ToiletNearby", 13},
+    {"GpsUnavailable", 14},
+    {"SosSending", 15},
+    {"SosSent", 16},
+    {"SosFailed", 17},
+    {"HomeNavigation", 18}
 };
 
 InitState initState = InitState::Disabled;
@@ -43,6 +49,8 @@ uint32_t readySince = 0;
 uint16_t pendingTrack = 0;
 bool responseSeen = false;
 bool missingResponseReported = false;
+bool playing = false;
+bool storagePresent = false;
 
 uint8_t receiveFrame[10] = {};
 uint8_t receivePosition = 0;
@@ -119,15 +127,19 @@ void HandleResponse(const uint8_t* frame)
     {
         case 0x3A:
             Serial.println("DFPlayer: SD card inserted");
+            storagePresent = true;
             break;
         case 0x3B:
             Serial.println("DFPlayer: SD card removed");
+            storagePresent = false;
             break;
         case 0x3D:
             Serial.printf("DFPlayer: track %u finished\r\n", value);
+            playing = false;
             break;
         case 0x3F:
             Serial.printf("DFPlayer: storage online, mask=0x%04X\r\n", value);
+            storagePresent = (value & 0x0002U) != 0;
             break;
         case 0x40:
             Serial.printf("DFPlayer: module error 0x%04X\r\n", value);
@@ -180,6 +192,7 @@ void HAL::Audio_Init()
     pendingTrack = 0;
     responseSeen = false;
     missingResponseReported = false;
+    storagePresent = false;
     receivePosition = 0;
 
     Serial.println("DFPlayer: waiting for module and SD card...");
@@ -188,6 +201,7 @@ void HAL::Audio_Init()
 void HAL::Audio_Update()
 {
     PollResponses();
+    playing = digitalRead(CONFIG_DFPLAYER_BUSY_PIN) == LOW;
 
     const uint32_t now = millis();
     if (static_cast<int32_t>(now - stateDeadline) < 0 &&
@@ -199,13 +213,13 @@ void HAL::Audio_Update()
     switch (initState)
     {
         case InitState::WaitForPower:
-            SendCommand(0x0C, 0, false);
-            initState = InitState::WaitAfterReset;
-            stateDeadline = now + 1500;
-            break;
-
-        case InitState::WaitAfterReset:
-            /* Select the microSD/TF card as the playback device. */
+            /*
+             * The module already performs its own power-on reset.  Sending
+             * command 0x0C here restarts the SD decoder and amplifier at the
+             * same instant and can pull a breadboard supply below the ESP32
+             * brownout threshold.  Select the card directly after the 2 s
+             * power-settle interval instead.
+             */
             SendCommand(0x09, 0x0002, true);
             initState = InitState::WaitAfterDeviceSelect;
             stateDeadline = now + 500;
@@ -260,41 +274,33 @@ bool HAL::Audio_PlayMusic(const char* name)
     return true;
 }
 
+bool HAL::Audio_Stop()
+{
+    if (initState != InitState::Ready) return false;
+    SendCommand(0x16, 0, true);
+    playing = false;
+    return true;
+}
+
+bool HAL::Audio_SetVolume(uint8_t volume)
+{
+    if (volume > 30) volume = 30;
+    if (initState != InitState::Ready) return false;
+    SendCommand(0x06, volume, true);
+    return true;
+}
+
+bool HAL::Audio_IsBusy()
+{
+    return playing;
+}
+
+bool HAL::Audio_HasStorage()
+{
+    return storagePresent;
+}
+
 #else
-
-#include "App/Utils/TonePlayer/TonePlayer.h"
-#include "App/Utils/TonePlayer/MusicCode.h"
-#include "lvgl.h"
-
-static TonePlayer player;
-
-static void Tone_Callback(uint32_t freq, uint16_t volume)
-{
-    HAL::Buzz_Tone(freq);
-}
-
-void HAL::Audio_Init()
-{
-    player.SetCallback(Tone_Callback);
-}
-
-void HAL::Audio_Update()
-{
-    player.Update(lv_tick_get());
-}
-
-bool HAL::Audio_PlayMusic(const char* name)
-{
-    for (const MusicList_t& music : MusicList)
-    {
-        if (strcmp(name, music.name) == 0)
-        {
-            player.Play(music.mc, music.length);
-            return true;
-        }
-    }
-
-    return false;
-}
+#error "CareGo requires CONFIG_AUDIO_USE_DFPLAYER=1"
 
 #endif

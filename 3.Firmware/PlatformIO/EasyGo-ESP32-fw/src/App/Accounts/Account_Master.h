@@ -16,6 +16,11 @@ AccountBroker* Broker();
 
 void IMU_Commit(HAL::IMU_Info_t* info);
 void BT_Commit(HAL::Dummy_Info_t* info);
+void Location_Commit(const Location_Info_t* info);
+void Location_GpsCommit(const Location_Info_t* info);
+void Location_LbsCommit(const Location_Info_t* info);
+void Network_Commit(const Network_Info_t* info);
+void Input_Commit(const Input_Info_t* info);
 }
 
 #endif

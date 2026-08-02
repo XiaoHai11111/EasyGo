@@ -26,6 +26,7 @@
 #include "Navigation/Navigation.h"
 #include "Family/Family.h"
 #include "Setting/Setting.h"
+#include "DeviceStatus/DeviceStatus.h"
 
 #define APP_CLASS_MATCH(className)\
 do{\
@@ -42,6 +43,7 @@ PageBase* AppFactory::CreatePage(const char* name)
     APP_CLASS_MATCH(Navigation);
     APP_CLASS_MATCH(Family);
     APP_CLASS_MATCH(Setting);
+    APP_CLASS_MATCH(DeviceStatus);
 
     return nullptr;
 }

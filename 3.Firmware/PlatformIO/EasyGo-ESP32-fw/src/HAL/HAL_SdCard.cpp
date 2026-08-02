@@ -2,21 +2,30 @@
 #include "SPI.h"
 #include "SD.h"
 
+namespace
+{
+bool cardReady = false;
+float cardSizeMb = 0.0f;
+HAL::SD_CallbackFunction_t eventCallback = nullptr;
+}
+
 bool HAL::SD_Init()
 {
-    pinMode(CONFIG_SD_DET_PIN, INPUT);
+    if (CONFIG_SD_DET_PIN >= 0) pinMode(CONFIG_SD_DET_PIN, INPUT);
+    pinMode(CONFIG_SD_CS_PIN, OUTPUT);
+    digitalWrite(CONFIG_SD_CS_PIN, HIGH);
 
-    SPIClass* sd_spi = new SPIClass(HSPI); // another SPI
-    if (!SD.begin(15, *sd_spi, 80000000)) // SD-Card SS pin is 15
+    /* Share VSPI with the display; each device keeps an independent CS pin. */
+    if (!SD.begin(CONFIG_SD_CS_PIN, SPI, 16000000))
     {
-        Serial.println("Card Mount Failed");
+        Serial.printf("SD: mount failed on shared VSPI, CS%d\r\n", CONFIG_SD_CS_PIN);
         return false;
     }
     uint8_t cardType = SD.cardType();
 
     if (cardType == CARD_NONE)
     {
-        Serial.println("No SD card attached");
+        Serial.println("SD: no card attached");
         return false;
     }
 
@@ -35,16 +44,16 @@ bool HAL::SD_Init()
         Serial.println("UNKNOWN");
     }
 
-    uint64_t cardSize = SD.cardSize() / (1024 * 1024);
-    Serial.printf("SD Card Size: %lluMB\n", cardSize);
-
+    cardSizeMb = static_cast<float>(SD.cardSize()) / (1024.0f * 1024.0f);
+    cardReady = true;
+    Serial.printf("SD: %.0f MB, shared VSPI CS%d\r\n", cardSizeMb, CONFIG_SD_CS_PIN);
     return true;
 }
 
 bool HAL::SD_GetReady()
 {
 #if CONFIG_ENABLE_SD_CARD
-    return !digitalRead(CONFIG_SD_DET_PIN);
+    return CONFIG_SD_DET_PIN >= 0 ? digitalRead(CONFIG_SD_DET_PIN) == LOW : cardReady;
 #else
     return false;
 #endif
@@ -52,20 +61,18 @@ bool HAL::SD_GetReady()
 
 float HAL::SD_GetCardSizeMB()
 {
-    return 32 * 1024;
-}
-
-static void SD_Check(bool isInsert)
-{
-
+    return cardSizeMb;
 }
 
 void HAL::SD_SetEventCallback(SD_CallbackFunction_t callback)
 {
-
+    eventCallback = callback;
 }
 
 void HAL::SD_Update()
 {
-
+    static bool previous = cardReady;
+    const bool current = SD_GetReady();
+    if (current != previous && eventCallback) eventCallback(current);
+    previous = current;
 }

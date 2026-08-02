@@ -28,7 +28,7 @@ lv_obj_t* FamilyView::CreateContact(lv_obj_t* root, int index, const FamilyModel
 
     lv_obj_t* call = EasyGoUi::Panel(card, 171, 8, 38, 38, lv_color_hex(0xE9F7EC), LV_RADIUS_CIRCLE);
     EasyGoUi::Pressable(call);
-    EasyGoUi::Symbol(call, LV_SYMBOL_CALL, EasyGoUi::Green, 8, 8, &lv_font_montserrat_20);
+    EasyGoUi::Symbol(call, LV_SYMBOL_ENVELOPE, EasyGoUi::Green, 8, 8, &lv_font_montserrat_20);
     return call;
 }
 
@@ -64,13 +64,14 @@ void FamilyView::Create(lv_obj_t* root, const FamilyModel& model)
     EasyGoUi::Pressable(ui.sos);
     lv_obj_t* badge = EasyGoUi::Panel(ui.sos, 12, 9, 38, 38, lv_color_white(), LV_RADIUS_CIRCLE);
     EasyGoUi::Label(badge, "SOS", &lv_font_montserrat_14, EasyGoUi::Red, 2, 11, 34);
-    EasyGoUi::Label(ui.sos, "一键求助", &font_easygo_20, lv_color_white(), 75, 12);
-    //ui.feedback = EasyGoUi::Label(ui.sos, "演示：发送位置给联系人", &font_easygo_14,
-    //                              lv_color_white(), 63, 33);
+    EasyGoUi::Label(ui.sos, "一键求助", &font_easygo_20, lv_color_white(), 75, 5);
+    ui.feedback = EasyGoUi::Label(ui.sos, "", &font_easygo_12,
+                                  lv_color_white(), 57, 31, 153);
 }
 
 void FamilyView::ShowFeedback(const char* text, lv_color_t color)
 {
+    if (!ui.feedback || !lv_obj_is_valid(ui.feedback)) return;
     lv_label_set_text(ui.feedback, text);
     lv_obj_set_style_bg_color(ui.sos, color, 0);
 }

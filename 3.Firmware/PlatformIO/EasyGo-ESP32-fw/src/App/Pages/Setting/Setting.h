@@ -22,7 +22,9 @@ public:
 
 private:
     static void onEvent(lv_event_t* event);
+    static void onRefresh(lv_timer_t* timer);
     SettingView View;
     SettingModel Model;
+    lv_timer_t* refreshTimer;
 };
 }

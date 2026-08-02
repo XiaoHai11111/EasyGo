@@ -15,11 +15,11 @@ void NavigationView::Create(lv_obj_t* root, const char* mapPath, int distanceMet
     EasyGoUi::Panel(root, 57, 48, 9, 34, EasyGoUi::Green, 4);
     EasyGoUi::Symbol(root, LV_SYMBOL_UP, EasyGoUi::Green, 45, 32, &lv_font_montserrat_36);
     EasyGoUi::Label(root, "直行", &font_easygo_20, EasyGoUi::Green, 88, 30);
-    EasyGoUi::Label(root, "120", &lv_font_montserrat_32, EasyGoUi::Ink, 86, 47);
+    ui.topDistance = EasyGoUi::Label(root, "--", &lv_font_montserrat_32, EasyGoUi::Ink, 88, 50);
     EasyGoUi::Label(root, "米", &font_easygo_20, EasyGoUi::Ink, 148, 55);
     lv_obj_t* toilet = EasyGoUi::Panel(root, 83, 82, 20, 20, EasyGoUi::Blue, 5);
     EasyGoUi::Label(toilet, "WC", &lv_font_montserrat_10, lv_color_white(), 1, 6, 20);
-    EasyGoUi::Label(root, "前方: 公共厕所", &font_easygo_14, EasyGoUi::Ink, 108, 82);
+    ui.target = EasyGoUi::Label(root, "正在准备导航", &font_easygo_14, EasyGoUi::Ink, 108, 82);
 
     lv_obj_t* map = EasyGoUi::Panel(
         root,
@@ -118,9 +118,23 @@ void NavigationView::Create(lv_obj_t* root, const char* mapPath, int distanceMet
     lv_obj_set_style_border_side(footer, LV_BORDER_SIDE_TOP, 0);
     (void)distanceMeters;
     (void)minutes;
-    ui.distance = EasyGoUi::Label(footer, "距离: 120 米", &font_easygo_16, EasyGoUi::Ink, 13, 15);
-    EasyGoUi::Label(footer, "|", &lv_font_montserrat_20, EasyGoUi::Muted, 119, 12);
-    ui.minutes = EasyGoUi::Label(footer, "约 2 分钟", &font_easygo_16, EasyGoUi::Ink, 145, 15);
+    ui.status = EasyGoUi::Label(footer, "", &font_easygo_12, EasyGoUi::Muted, 7, 2, 226);
+    ui.distance = EasyGoUi::Label(footer, "距离: 120 米", &font_easygo_16, EasyGoUi::Ink, 13, 25);
+    EasyGoUi::Label(footer, "|", &lv_font_montserrat_20, EasyGoUi::Muted, 119, 22);
+    ui.minutes = EasyGoUi::Label(footer, "约 2 分钟", &font_easygo_16, EasyGoUi::Ink, 145, 25);
+}
+
+void NavigationView::UpdateState(const AccountSystem::CareGo_State_t& state)
+{
+    if (!ui.status) return;
+    lv_label_set_text(ui.status, state.statusText);
+    lv_label_set_text_fmt(ui.topDistance, state.distanceMeters > 0 ? "%ld" : "--",
+        static_cast<long>(state.distanceMeters));
+    lv_label_set_text_fmt(ui.distance, state.distanceMeters > 0 ? "距离: %ld 米" : "距离: --",
+        static_cast<long>(state.distanceMeters));
+    lv_label_set_text_fmt(ui.minutes, state.minutes > 0 ? "约 %d 分钟" : "时间待定", state.minutes);
+    if (state.targetName[0]) lv_label_set_text_fmt(ui.target, "前方: %s", state.targetName);
+    else lv_label_set_text(ui.target, "正在获取目标");
 }
 
 void NavigationView::SetMapSource(const char* mapPath)

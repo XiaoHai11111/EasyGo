@@ -13,11 +13,6 @@ public:
     void Init();
     void DeInit();
     void PlayMusic(const char* music);
-    void SetEncoderEnable(bool en)
-    {
-        HAL::Encoder_SetEnable(en);
-    }
-
 private:
     Account* account;
 };

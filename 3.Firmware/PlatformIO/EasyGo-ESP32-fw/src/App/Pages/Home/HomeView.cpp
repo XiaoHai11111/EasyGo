@@ -4,10 +4,7 @@ using namespace Page;
 
 void HomeView::CreateLocationIcon(lv_obj_t* parent, lv_color_t color)
 {
-    lv_obj_t* tail = EasyGoUi::Panel(parent, 17, 23, 13, 13, color, 2);
-    lv_obj_set_style_transform_angle(tail, 450, 0);
-    lv_obj_t* pin = EasyGoUi::Panel(parent, 11, 6, 25, 25, color, LV_RADIUS_CIRCLE);
-    EasyGoUi::Panel(pin, 8, 8, 9, 9, lv_color_white(), LV_RADIUS_CIRCLE);
+    EasyGoUi::LocationPin(parent, 2, 3, color, lv_color_white());
 }
 
 void HomeView::CreateFamilyIcon(lv_obj_t* parent, lv_color_t color)

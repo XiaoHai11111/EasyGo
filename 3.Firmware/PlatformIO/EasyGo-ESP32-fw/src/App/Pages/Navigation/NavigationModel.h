@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include "App/Services/CareGoClient.h"
 
 namespace Page
 {
@@ -29,8 +30,11 @@ public:
         MapInitialScrollY = 164
     };
 
-    void Init() {}
+    void Init() { client.Init("NavigationModel"); }
     void Deinit() {}
+    AccountSystem::CareGo_State_t State() const { return client.State(); }
+    void StartToiletNavigation() { client.Send(AccountSystem::CAREGO_CMD_NAVIGATE_TOILET); }
+    void StopNavigation() { client.Send(AccountSystem::CAREGO_CMD_STOP_NAVIGATION); }
     int ClampZoomLevel(int level) const
     {
         if (level < ZoomLevelMin) return ZoomLevelMin;
@@ -106,5 +110,8 @@ public:
     }
     int DistanceMeters() const { return 120; }
     int Minutes() const { return 2; }
+
+private:
+    CareGoClient client;
 };
 }

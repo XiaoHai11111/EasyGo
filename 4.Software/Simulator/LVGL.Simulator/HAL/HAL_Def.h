@@ -53,14 +53,6 @@ typedef struct
     float yaw;
 } Dummy_Info_t;
 
-/* Power */
-typedef struct
-{
-    uint16_t voltage;
-    uint8_t usage;
-    bool isCharging;
-} Power_Info_t;
-
 }
 
 #endif

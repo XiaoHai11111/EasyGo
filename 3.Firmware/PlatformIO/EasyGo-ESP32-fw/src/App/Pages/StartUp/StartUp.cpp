@@ -14,7 +14,6 @@ void Startup::onCustomAttrConfig()
 void Startup::onViewLoad()
 {
     Model.Init();
-    Model.SetEncoderEnable(false);
     View.Create(root);
     timer = lv_timer_create(onTimer, 2200, this);
     lv_timer_set_repeat_count(timer, 1);
@@ -44,6 +43,5 @@ void Startup::onViewDidUnload()
         timer = nullptr;
     }
     View.Delete();
-    Model.SetEncoderEnable(true);
     Model.DeInit();
 }

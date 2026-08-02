@@ -1,0 +1,17 @@
+<html>
+<body>
+<pre>
+<h1>礦ision Build Log</h1>
+<h2>Project:</h2>
+E:\新品\161012-MP3 TF卡模块\MP3-TF-16P模块使用说明书(555-PC--Administrator--2014-05-09-14,09,06)\MP3-TF-16P模块使用说明书\MP3-TF-16P测试参考代码\YX5200_TEST_V1.7\YX5200.uvproj
+Project File Date:  07/22/2013
+
+<h2>Output:</h2>
+Build target 'Target 1'
+assembling STARTUP.A51...
+compiling main.c...
+compiling Log.c...
+linking...
+Program Size: data=43.0 xdata=0 code=697
+creating hex file from ".\output\QYtest"...
+".\output\QYtest" - 0 Error(s), 0 Warning(s).

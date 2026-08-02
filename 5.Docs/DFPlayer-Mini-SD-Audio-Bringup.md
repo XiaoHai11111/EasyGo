@@ -29,6 +29,8 @@
 
 如果使用独立 5V 电源给 DFPlayer 供电，电源负极必须与 ESP32 GND 相连。首次测试把音量保持在当前默认值 20/30，确认无过热、异常电流和严重噪声后再调整。
 
+DFPlayer 自身上电后会完成复位。当前固件等待 2 秒后直接选择 TF 卡并设置音量，不再额外发送 `0x0C` 软复位；实测二次软复位会让 SD 解码器和功放同时重新启动，在面包板供电裕量不足时触发 ESP32 Brownout。
+
 ## 2. microSD 卡准备
 
 1. 使用不超过 32GB 的 microSD/TF 卡。
@@ -65,6 +67,13 @@
 | `0009.mp3` | `DeviceInsert` | 设备插入 |
 | `0010.mp3` | `DevicePullout` | 设备拔出 |
 | `0011.mp3` | `NoOperationWarning` | 长时间无操作 |
+| `0012.mp3` | `HelpMandarin` | 普通话求助语音 |
+| `0013.mp3` | `ToiletNearby` | 附近有厕所提醒 |
+| `0014.mp3` | `GpsUnavailable` | GPS 暂不可用 |
+| `0015.mp3` | `SosSending` | 正在发送 SOS |
+| `0016.mp3` | `SosSent` | SOS 已受理 |
+| `0017.mp3` | `SosFailed` | SOS 失败 |
+| `0018.mp3` | `HomeNavigation` | 开始回家导航 |
 
 首次测试只准备 `0001.mp3` 即可。
 

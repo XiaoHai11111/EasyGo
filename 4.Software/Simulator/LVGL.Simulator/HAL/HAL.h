@@ -37,35 +37,14 @@ namespace HAL
 
     bool  BluetoothConnected();
 
-    /* Power */
-    void Power_Init();
-    void Power_HandleTimeUpdate();
-    void Power_SetAutoLowPowerTimeout(uint16_t sec);
-    uint16_t Power_GetAutoLowPowerTimeout();
-    void Power_SetAutoLowPowerEnable(bool en);
-    void Power_Shutdown();
-    void Power_Update();
-    void Power_EventMonitor();
-    void Power_GetInfo(Power_Info_t* info);
-    typedef void(*Power_CallbackFunction_t)(void);
-    void Power_SetEventCallback(Power_CallbackFunction_t callback);
-
-    /* Buzzer */
-    void Buzz_init();
-    void Buzz_SetEnable(bool en);
-    void Buzz_Tone(uint32_t freq, int32_t duration = -1);
-
-    /* Encoder */
-    void Encoder_Init();
-    void Encoder_Update();
-    int32_t Encoder_GetDiff();
-    bool Encoder_GetIsPush();
-    void Encoder_SetEnable(bool en);
-
-    /* Audio */
+/* Audio */
     void Audio_Init();
     void Audio_Update();
     bool Audio_PlayMusic(const char* name);
+    bool Audio_Stop();
+    bool Audio_SetVolume(uint8_t volume);
+    bool Audio_IsBusy();
+    bool Audio_HasStorage();
 
 }
 

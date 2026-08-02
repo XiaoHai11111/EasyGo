@@ -1,4 +1,5 @@
 #include "FamilyModel.h"
+#include "App/Configs/Config.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -16,12 +17,45 @@ const char* FamilyModel::ContactsPath() const
 void FamilyModel::Init()
 {
     contactCount = 0;
+    sosPhone[0] = '\0';
+    AddContact("紧急联系人", CONFIG_EMERGENCY_PHONE_DEFAULT, 3);
     if (!LoadFromSd()) LoadFallback();
+    CopyDialableNumber(CONFIG_EMERGENCY_PHONE_DEFAULT, sosPhone, sizeof(sosPhone));
+    for (uint8_t i = 0; i < contactCount && !sosPhone[0]; ++i)
+    {
+        CopyDialableNumber(contacts[i].number, sosPhone, sizeof(sosPhone));
+    }
+    client.Init("FamilyModel");
 }
 
 void FamilyModel::Deinit()
 {
     contactCount = 0;
+}
+
+bool FamilyModel::RequestSos()
+{
+    return client.Send(AccountSystem::CAREGO_CMD_SEND_SOS, false, sosPhone);
+}
+
+bool FamilyModel::RequestSosForContact(uint8_t index)
+{
+    if (index >= contactCount) return false;
+    char phone[24] = {};
+    if (!CopyDialableNumber(contacts[index].number, phone, sizeof(phone))) return false;
+    return client.Send(AccountSystem::CAREGO_CMD_SEND_SOS, false, phone);
+}
+
+bool FamilyModel::CopyDialableNumber(const char* source, char* target, size_t targetSize) const
+{
+    if (!source || !target || targetSize == 0 || strchr(source, '*')) return false;
+    size_t write = 0;
+    for (const char* p = source; *p && write + 1 < targetSize; ++p)
+        if ((*p >= '0' && *p <= '9') || (*p == '+' && write == 0)) target[write++] = *p;
+    target[write] = '\0';
+    if (write >= 5) return true;
+    target[0] = '\0';
+    return false;
 }
 
 void FamilyModel::AddContact(const char* name, const char* number, uint8_t avatarStyle)
@@ -38,6 +72,7 @@ void FamilyModel::AddContact(const char* name, const char* number, uint8_t avata
 
 bool FamilyModel::LoadFromSd()
 {
+    const uint8_t countBeforeLoad = contactCount;
     lv_fs_file_t file;
     if (lv_fs_open(&file, ContactsPath(), LV_FS_MODE_RD) != LV_FS_RES_OK) return false;
 
@@ -88,7 +123,7 @@ bool FamilyModel::LoadFromSd()
         AddContact(line, firstComma + 1, avatarStyle);
     }
 
-    return contactCount > 0;
+    return contactCount > countBeforeLoad;
 }
 
 void FamilyModel::LoadFallback()

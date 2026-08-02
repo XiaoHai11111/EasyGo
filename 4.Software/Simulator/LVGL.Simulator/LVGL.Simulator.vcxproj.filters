@@ -747,9 +747,6 @@
     <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\StartUp\StartUpView.h">
       <Filter>App\Pages\Startup</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\StatusBar\StatusBar.h">
-      <Filter>App\Pages\StatusBar</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Setting\Setting.h">
       <Filter>App\Pages\Setting</Filter>
     </ClInclude>
@@ -758,6 +755,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Setting\SettingView.h">
       <Filter>App\Pages\Setting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\DeviceStatus\DeviceStatus.h">
+      <Filter>App\Pages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\DeviceStatus\DeviceStatusModel.h">
+      <Filter>App\Pages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\DeviceStatus\DeviceStatusView.h">
+      <Filter>App\Pages</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Services\CareGoClient.h">
+      <Filter>App</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\AppFactory.h">
       <Filter>App\Pages</Filter>
@@ -1637,9 +1646,6 @@
     <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\StartUp\StartUpView.cpp">
       <Filter>App\Pages\Startup</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\StatusBar\StatusBar.cpp">
-      <Filter>App\Pages\StatusBar</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Setting\Setting.cpp">
       <Filter>App\Pages\Setting</Filter>
     </ClCompile>
@@ -1648,6 +1654,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\Setting\SettingView.cpp">
       <Filter>App\Pages\Setting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\DeviceStatus\DeviceStatus.cpp">
+      <Filter>App\Pages</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\DeviceStatus\DeviceStatusView.cpp">
+      <Filter>App\Pages</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Services\CareGoClient.cpp">
+      <Filter>App</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Pages\AppFactory.cpp">
       <Filter>App\Pages</Filter>
@@ -1691,16 +1706,7 @@
     <ClCompile Include="HAL\HAL_Audio.cpp">
       <Filter>HAL</Filter>
     </ClCompile>
-    <ClCompile Include="HAL\HAL_Buzz.cpp">
-      <Filter>HAL</Filter>
-    </ClCompile>
-    <ClCompile Include="HAL\HAL_Encoder.cpp">
-      <Filter>HAL</Filter>
-    </ClCompile>
     <ClCompile Include="HAL\HAL_IMU.cpp">
-      <Filter>HAL</Filter>
-    </ClCompile>
-    <ClCompile Include="HAL\HAL_Power.cpp">
       <Filter>HAL</Filter>
     </ClCompile>
     <ClCompile Include="HAL\HAL_SD_CARD.cpp">
@@ -1727,7 +1733,16 @@
     <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Accounts\ACT_MusicPlayer.cpp">
       <Filter>App\Accounts</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Accounts\ACT_Power.cpp">
+    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Accounts\ACT_CareGo.cpp">
+      <Filter>App\Accounts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Accounts\ACT_Input.cpp">
+      <Filter>App\Accounts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Accounts\ACT_Location.cpp">
+      <Filter>App\Accounts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Accounts\ACT_Network.cpp">
       <Filter>App\Accounts</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\3.Firmware\PlatformIO\EasyGo-ESP32-fw\src\App\Accounts\ACT_Storage.cpp">

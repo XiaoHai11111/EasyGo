@@ -1,0 +1,226 @@
+#include <Arduino.h>
+
+// ========== 引脚分配（避开队友工程已用引脚） ==========
+// 4G: GPIO13 = ESP32 TX -> 4G RX, GPIO14 = ESP32 RX <- 4G TX
+// GPS: GPIO4 = ESP32 RX <- GPS TX, GPIO32 = ESP32 TX -> GPS RX(可选)
+//4G模块，现在使用的是中国移动cmnet，电信为ctnet，联通为3gnet，改第134行
+HardwareSerial Serial4G(1);
+HardwareSerial gpsSerial(2);
+
+#define GPS_RX_PIN 4
+#define GPS_TX_PIN 32
+#define GPS_BAUD   9600
+
+#define SERVER_IP "134.175.109.168"
+
+// 无卫星时使用的测试坐标：经度,纬度
+#define FALLBACK_LNG 113.881238
+#define FALLBACK_LAT 22.551365
+
+String readResp(uint32_t timeoutMs = 3000) {
+  String resp = "";
+  uint32_t start = millis();
+  while (millis() - start < timeoutMs) {
+    while (Serial4G.available()) {
+      resp += (char)Serial4G.read();
+    }
+  }
+  return resp;
+}
+
+String sendCmdRaw(const char* cmd, uint32_t timeoutMs = 3000) {
+  Serial4G.println(cmd);
+  return readResp(timeoutMs);
+}
+
+bool sendCmd(const char* cmd, const char* expect = "OK", uint32_t timeoutMs = 3000) {
+  String resp = sendCmdRaw(cmd, timeoutMs);
+  return resp.indexOf(expect) >= 0;
+}
+
+// ---------- NMEA 解析 ----------
+String getField(const String& line, int index) {
+  int start = 0;
+  for (int i = 0; i < index; i++) {
+    int p = line.indexOf(',', start);
+    if (p < 0) return "";
+    start = p + 1;
+  }
+  int end = line.indexOf(',', start);
+  if (end < 0) end = line.length();
+  return line.substring(start, end);
+}
+
+double nmeaToDecimal(const String& field, bool negative) {
+  double ddmm = atof(field.c_str());
+  int deg = (int)(ddmm / 100.0);
+  double minutes = ddmm - deg * 100.0;
+  double dec = deg + minutes / 60.0;
+  return negative ? -dec : dec;
+}
+
+bool parseGGA(const String& line, double& lat, double& lng, int& sats) {
+  if (!line.startsWith("$GNGGA") && !line.startsWith("$GPGGA")) return false;
+
+  String quality = getField(line, 6);
+  if (quality == "0") return false;
+
+  String latField = getField(line, 2);
+  String latNS   = getField(line, 3);
+  String lngField = getField(line, 4);
+  String lngEW   = getField(line, 5);
+
+  if (latField.length() < 4 || lngField.length() < 4) return false;
+
+  lat = nmeaToDecimal(latField, latNS == "S");
+  lng = nmeaToDecimal(lngField, lngEW == "W");
+  sats = getField(line, 7).toInt();
+  return true;
+}
+
+bool readGPS(double& lat, double& lng, int& sats, uint32_t waitMs = 5000) {
+  String line = "";
+  uint32_t start = millis();
+  while (millis() - start < waitMs) {
+    while (gpsSerial.available()) {
+      char c = gpsSerial.read();
+      if (c == '\n') {
+        if (parseGGA(line, lat, lng, sats)) return true;
+        line = "";
+      } else if (c != '\r') {
+        line += c;
+      }
+    }
+  }
+  return false;
+}
+
+// ---------- JSON 简单解析 ----------
+String jsonGetString(const String& json, const char* key) {
+  String token = String("\"") + key + "\":\"";
+  int pos = json.indexOf(token);
+  if (pos < 0) return "";
+  pos += token.length();
+  int end = json.indexOf('"', pos);
+  if (end < 0) return "";
+  return json.substring(pos, end);
+}
+
+int jsonGetInt(const String& json, const char* key) {
+  String token = String("\"") + key + "\":";
+  int pos = json.indexOf(token);
+  if (pos < 0) return -1;
+  pos += token.length();
+  return json.substring(pos).toInt();
+}
+
+double jsonGetDouble(const String& json, const char* key) {
+  String token = String("\"") + key + "\":";
+  int pos = json.indexOf(token);
+  if (pos < 0) return 0;
+  pos += token.length();
+  int end = json.indexOf(',', pos);
+  if (end < 0) end = json.indexOf('}', pos);
+  if (end < 0) end = json.length();
+  return atof(json.substring(pos, end).c_str());
+}
+
+// ---------- 4G HTTP 查询 ----------
+bool queryNearby(double lat, double lng,
+                 String& name, String& address, String& arrow,
+                 int& distance, double& targetLat, double& targetLng) {
+  if (!sendCmd("AT", "OK", 5000)) return false;
+  sendCmd("AT+CPIN?", "READY", 5000);
+  sendCmd("AT+CGDCONT=1,\"IP\",\"cmnet\"", "OK", 5000);
+  sendCmd("AT+CGACT=1,1", "OK", 10000);
+
+  String url = String("AT+HTTPPARA=\"URL\",\"http://") + SERVER_IP
+             + ":5000/api/nearby?lat=" + String(lat, 6)
+             + "&lng=" + String(lng, 6) + "\"";
+
+  sendCmd("AT+HTTPINIT", "OK", 5000);
+  sendCmd(url.c_str(), "OK", 5000);
+  sendCmd("AT+HTTPACTION=0", "+HTTPACTION:", 20000);
+
+  String raw = sendCmdRaw("AT+HTTPREAD=0,2048", 10000);
+
+  int brace = raw.indexOf('{');
+  if (brace < 0) {
+    sendCmd("AT+HTTPTERM", "OK", 5000);
+    return false;
+  }
+  raw = raw.substring(brace);
+
+  name     = jsonGetString(raw, "name");
+  address  = jsonGetString(raw, "address");
+  arrow    = jsonGetString(raw, "direction_arrow");
+  distance = jsonGetInt(raw, "distance_m");
+  targetLat = jsonGetDouble(raw, "target_lat");
+  targetLng = jsonGetDouble(raw, "target_lng");
+
+  sendCmd("AT+HTTPTERM", "OK", 5000);
+  return true;
+}
+
+// ---------- 主流程 ----------
+void setup() {
+  Serial.begin(115200);
+  Serial4G.begin(115200, SERIAL_8N1, 14, 13);
+  gpsSerial.begin(GPS_BAUD, SERIAL_8N1, GPS_RX_PIN, GPS_TX_PIN);
+
+  Serial.println("\n===== GPS + 4G 附近洗手间测试 =====");
+
+  double lat = 0, lng = 0;
+  int sats = 0;
+  bool located = false;
+
+  Serial.println("等待 GPS 定位...");
+  for (int i = 1; i <= 10; i++) {
+    Serial.print("第 ");
+    Serial.print(i);
+    Serial.println(" 次搜索卫星...");
+
+    located = readGPS(lat, lng, sats, 5000);
+    if (located) {
+      Serial.print("GPS 定位成功，卫星数: ");
+      Serial.println(sats);
+      break;
+    }
+  }
+
+  if (!located) {
+    lat = FALLBACK_LAT;
+    lng = FALLBACK_LNG;
+    Serial.println("10 次未找到卫星，使用测试坐标");
+  }
+
+  Serial.print("当前位置: ");
+  Serial.print(lat, 6);
+  Serial.print(", ");
+  Serial.println(lng, 6);
+
+  String name, address, arrow;
+  int distance = -1;
+  double targetLat = 0, targetLng = 0;
+
+  bool ok = queryNearby(lat, lng, name, address, arrow,
+                        distance, targetLat, targetLng);
+
+  if (ok) {
+    Serial.println("\n===== 解析结果 =====");
+    Serial.println("名称: " + name);
+    Serial.println("地址: " + address);
+    Serial.println("距离: " + String(distance) + " 米");
+    Serial.println("方向: " + arrow);
+    Serial.print("目标坐标: ");
+    Serial.print(targetLat, 6);
+    Serial.print(", ");
+    Serial.println(targetLng, 6);
+  } else {
+    Serial.println("查询失败，请检查 4G 模块或服务器");
+  }
+  Serial.println("===== 测试结束 =====");
+}
+
+void loop() {
+}

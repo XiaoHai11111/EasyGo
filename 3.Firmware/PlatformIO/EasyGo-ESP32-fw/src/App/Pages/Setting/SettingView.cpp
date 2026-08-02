@@ -32,9 +32,9 @@ void SettingView::Create(lv_obj_t* root, bool voiceEnabled, int brightness)
     CreateRow(root, 1, LV_SYMBOL_LIST, EasyGoUi::Blue, "语言选择", "当前语言: 简体中文", true);
     (void)brightness;
     CreateRow(root, 2, LV_SYMBOL_EYE_OPEN, EasyGoUi::Orange, "屏幕亮度", "当前亮度: 80%", true);
-    CreateRow(root, 3, LV_SYMBOL_GPS, EasyGoUi::Green, "电子围栏", "未设置", true);
-    CreateRow(root, 4, LV_SYMBOL_BELL, EasyGoUi::Red, "紧急提醒设置", "未设置", true);
-    CreateRow(root, 5, LV_SYMBOL_SETTINGS, lv_color_hex(0x8B6BD6), "关于我们", nullptr, true);
+    ui.homeRow = CreateRow(root, 3, LV_SYMBOL_HOME, EasyGoUi::Green, "家庭位置", "点击将当前位置设为家", true);
+    ui.diagnosticsRow = CreateRow(root, 4, LV_SYMBOL_GPS, EasyGoUi::Blue, "设备状态", "GPS、4G、语音与存储", true);
+    ui.feedback = EasyGoUi::Label(root, "", &font_easygo_12, EasyGoUi::Muted, 12, 251, 216);
 
     ui.backHome = EasyGoUi::Panel(root, 12, 284, 216, 31, EasyGoUi::Orange, 10);
     EasyGoUi::Pressable(ui.backHome);
@@ -47,4 +47,10 @@ void SettingView::SetVoice(bool enabled)
     lv_obj_set_style_bg_color(ui.voiceSwitch,
                               enabled ? EasyGoUi::Green : lv_color_hex(0xC8CDD2), 0);
     lv_obj_set_x(ui.voiceKnob, enabled ? 20 : 2);
+}
+
+void SettingView::UpdateState(const AccountSystem::CareGo_State_t& state)
+{
+    SetVoice(state.voiceEnabled);
+    if (ui.feedback) lv_label_set_text(ui.feedback, state.statusText);
 }

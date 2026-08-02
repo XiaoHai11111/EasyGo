@@ -22,22 +22,22 @@ void HAL::Init()
     HAL::BT_Init(); // ToDo: some of the process below will interrupt BLE connection, find it out
     #endif
 
-    #if CONFIG_ENABLE_POWER
-    HAL::Power_Init();
-    #endif
-
     HAL::Backlight_Init();
-
-    #if CONFIG_ENABLE_ENCODER
-    HAL::Encoder_Init();
-    #endif
-
-    #if CONFIG_ENABLE_BUZZER
-    HAL::Buzz_init();
-    #endif
 
     #if CONFIG_ENABLE_AUDIO
     HAL::Audio_Init();
+    #endif
+
+    #if CONFIG_ENABLE_GPS
+    HAL::GPS_Init();
+    #endif
+
+    #if CONFIG_ENABLE_CELLULAR
+    HAL::Cellular_Init();
+    #endif
+
+    #if CONFIG_ENABLE_KEYS
+    HAL::Keys_Init();
     #endif
 
     #if CONFIG_ENABLE_SD_CARD
@@ -63,16 +63,20 @@ void HAL::Init()
 
 void HAL::Update()
 {
-    #if CONFIG_ENABLE_POWER
-    HAL::Power_Update();
-    #endif
-
-    #if CONFIG_ENABLE_ENCODER
-    HAL::Encoder_Update();
-    #endif
-
     #if CONFIG_ENABLE_AUDIO
     HAL::Audio_Update();
+    #endif
+
+    #if CONFIG_ENABLE_GPS
+    HAL::GPS_Update();
+    #endif
+
+    #if CONFIG_ENABLE_CELLULAR
+    HAL::Cellular_Update();
+    #endif
+
+    #if CONFIG_ENABLE_KEYS
+    HAL::Keys_Update();
     #endif
 
     #if CONFIG_ENABLE_IMU

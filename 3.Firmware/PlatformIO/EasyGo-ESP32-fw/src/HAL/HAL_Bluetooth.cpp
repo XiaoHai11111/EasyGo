@@ -242,7 +242,7 @@ bool HAL::BT_Init()
 {
     Serial.println("Starting Peak-BLE Client");
 
-    NimBLEDevice::init("Peak-BLE");
+    NimBLEDevice::init("CareBridge-BLE");
 
     NimBLEDevice::setSecurityAuth(false, false, true);
     NimBLEDevice::setPower(ESP_PWR_LVL_P9); /** +9db */

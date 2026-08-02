@@ -46,13 +46,13 @@
  * board.
  */
 #define CONFIG_ENABLE_BLUETOOTH     0
-#define CONFIG_ENABLE_POWER         0
-#define CONFIG_ENABLE_ENCODER       0
-#define CONFIG_ENABLE_BUZZER        0
 #define CONFIG_ENABLE_AUDIO         1
 #define CONFIG_ENABLE_SD_CARD       0
 #define CONFIG_ENABLE_IMU           0
 #define CONFIG_ENABLE_TOUCH         1
+#define CONFIG_ENABLE_GPS           1
+#define CONFIG_ENABLE_CELLULAR      1
+#define CONFIG_ENABLE_KEYS          1
 
 /* Screen */
 #define CONFIG_SCREEN_CS_PIN        5
@@ -70,13 +70,6 @@
 #define CONFIG_SCREEN_ROTATION      0
 #define CONFIG_SCREEN_SELF_TEST     1
 
-/* Battery */
-#define CONFIG_BAT_DET_PIN          37
-#define CONFIG_BAT_CHG_DET_PIN      38
-
-/* Buzzer */
-#define CONFIG_BUZZ_PIN             25
-#define CONFIG_BUZZ_CHANNEL         2
 #define CONFIG_SOUND_ENABLE_DEFAULT true
 
 /*
@@ -91,9 +84,58 @@
 #define CONFIG_DFPLAYER_BUSY_PIN    34
 #define CONFIG_DFPLAYER_VOLUME      20
 
+/* GPS: input-only software serial. GPIO36 is connected to GPS TX. */
+#define CONFIG_GPS_RX_PIN           36
+#define CONFIG_GPS_BAUD             9600
+#define CONFIG_GPS_MAX_LINE_LENGTH  160
+#define CONFIG_TIMEZONE_OFFSET_MINUTES 480
+
+/* A7670/FS-MCore 4G module on UART1 (ESP32 pin names). */
+#define CONFIG_CELLULAR_RX_PIN      14
+#define CONFIG_CELLULAR_TX_PIN      13
+#define CONFIG_CELLULAR_BAUD        115200
+#define CONFIG_CELLULAR_APN         "cmnet"
+#define CONFIG_CELLULAR_SERVER      "134.175.109.168"
+#define CONFIG_CELLULAR_SERVER_PORT 5000
+/* Optional phone hotspot. Empty SSID keeps Wi-Fi disabled and uses 4G only. */
+// #define CONFIG_WIFI_SSID            "XiaoHai"
+// #define CONFIG_WIFI_PASSWORD        "11112222"
+#define CONFIG_WIFI_SSID            ""
+#define CONFIG_WIFI_PASSWORD        ""
+/* Public toilet HTTP stays disabled. SMS is enabled for the user-authorized SOS contact. */
+#define CONFIG_CELLULAR_ENABLE_EXTERNAL_REQUESTS 0
+#define CONFIG_CELLULAR_ENABLE_SMS               1
+#define CONFIG_CELLULAR_ENABLE_LBS               1
+/* GPS must remain unavailable for this long before the first 4G LBS request. */
+#define CONFIG_CELLULAR_LBS_GPS_GRACE_MS         30000UL
+/* Limit carrier positioning traffic and modem power use while GPS is unavailable. */
+#define CONFIG_CELLULAR_LBS_RETRY_MS             60000UL
+#define CONFIG_CELLULAR_LBS_VALID_MS             180000UL
+#define CONFIG_GPS_FIX_VALID_MS                  10000UL
+#define CONFIG_EMERGENCY_PHONE_DEFAULT           "13352934299"
+
+/*
+ * Two active-low keys.
+ *
+ * GPIO32 supports INPUT_PULLUP, so its button only needs to connect GPIO32 to
+ * GND.  GPIO35 is reserved for a future IMU interrupt driven by the sensor.
+ *
+ * The ESP32 Dev Module BOOT key is GPIO0 and can use INPUT_PULLUP.  Do not hold
+ * BOOT while resetting/powering the board, otherwise the ROM download mode is
+ * selected.
+ */
+#define CONFIG_KEY_TOILET_PIN       32
+#define CONFIG_KEY_TOILET_ENABLED   1
+#define CONFIG_KEY_HOME_PIN         0
+#define CONFIG_KEY_HOME_ENABLED     1
+#define CONFIG_KEY_DEBOUNCE_MS      35
+#define CONFIG_KEY_DOUBLE_MS        320
+#define CONFIG_KEY_LONG_MS          1500
+#define CONFIG_KEY_ARM_RELEASE_MS   800
+
 /* IMU */
-#define CONFIG_IMU_INT1_PIN         32
-#define CONFIG_IMU_INT2_PIN         33
+#define CONFIG_IMU_INT1_PIN         35
+#define CONFIG_IMU_INT2_PIN         39
 
 /* I2C */
 #define CONFIG_MCU_SDA_PIN          21
@@ -106,25 +148,16 @@
 #define CONFIG_TOUCH_INVERT_X       0
 #define CONFIG_TOUCH_INVERT_Y       0
 
-/* Encoder */
-#define CONFIG_ENCODER_B_PIN        34
-#define CONFIG_ENCODER_A_PIN        35
-#define CONFIG_ENCODER_PUSH_PIN     27
-
-/* Power */
-#define CONFIG_POWER_EN_PIN         21
-
 /* Debug USART */
 #define CONFIG_DEBUG_SERIAL         Serial
 
 /* SD CARD */
-#define CONFIG_SD_SPI               SPI_SD
 #define CONFIG_SD_CD_PIN            -1
-#define CONFIG_SD_MOSI_PIN          PB15
-#define CONFIG_SD_MISO_PIN          PB14
-#define CONFIG_SD_SCK_PIN           PB13
-#define CONFIG_SD_CS_PIN            15
-#define CONFIG_SD_DET_PIN           22
+#define CONFIG_SD_MOSI_PIN          CONFIG_SCREEN_MOSI_PIN
+#define CONFIG_SD_MISO_PIN          CONFIG_SCREEN_MISO_PIN
+#define CONFIG_SD_SCK_PIN           CONFIG_SCREEN_SCK_PIN
+#define CONFIG_SD_CS_PIN            4
+#define CONFIG_SD_DET_PIN           -1
 
 /* Stack Info */
 #define CONFIG_USE_STACK_INFO       0

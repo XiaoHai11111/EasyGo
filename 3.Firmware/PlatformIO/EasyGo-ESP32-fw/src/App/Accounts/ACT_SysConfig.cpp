@@ -29,10 +29,7 @@ static int onEvent(Account* account, Account::EventParam_t* param)
     {
         case Account::EVENT_NOTIFY:
         {
-            if (info->cmd == SYSCONFIG_CMD_LOAD)
-            {
-                HAL::Buzz_SetEnable(sysConfig.soundEnable);
-            }
+            if (info->cmd == SYSCONFIG_CMD_LOAD) sysConfig.cmd = SYSCONFIG_CMD_LOAD;
         }
             break;
         case Account::EVENT_SUB_PULL:

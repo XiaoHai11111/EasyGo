@@ -29,7 +29,7 @@
 4. 在 `ResourcePool.cpp` 中注册页面使用的全部图片和字体资源。
 5. 确认资源源文件及页面源文件同时存在于 `.vcxproj` 和 `.vcxproj.filters`。
 
-当前启动链路为 `Startup -> Home`。Home 的三个入口分别进入 `Navigation`、`Family` 和 `Setting`。这些页面继续使用 `Page / View / Model / ResourcePool` 架构，旧的 `DummyHome/Ctrl/Teach/SystemInfos` 名称不再参与工程。
+当前启动链路为 `Startup -> Home`。Home 的三个入口分别进入 `Navigation`、`Family` 和 `Setting`，Setting 可进入 `DeviceStatus`。这些页面继续使用 `Page / View / Model / ResourcePool` 架构；页面 Model 通过 `CareGoClient` 订阅 `CareGo` 固定大小状态，不直接读取硬件 HAL。
 
 ## 分辨率、字体与模拟 SD 卡
 
@@ -57,7 +57,7 @@
 - `shenzhen.bin` 是供 LVGL 显示的 RGB565 像素数据，不包含可供运行时搜索的 POI 结构。
 - `shenzhen_baoan.osm.json` 是当前宝安区地图与 POI 的 OSM 原始快照，包含主要道路以及 89 个 `amenity=toilets` 对象。
 - `shenzhen_toilets.bin` 是适合 MCU 顺序读取的定长 POI 索引，保存 OSM 标识、WGS84 经纬度、对象类型、名称和有限属性；头部、记录、比例尺与 CRC32 见 `MAP_FORMAT.md`。
-- 当前固件尚未接入 POI 索引查询；文件存在和格式正确不等同于附近厕所搜索已经完成。
+- `ACT_Network` 已接入 POI 索引顺序扫描，按 WGS84 Haversine 直线距离选择最近记录；道路路线、开放时间过滤和可达性判断尚未实现。
 - 地图缩放使用 1×、2×、4×、8×、16×、32×、64× 七个 720×492 RGB565 大画布层级；`shenzhen.bin` 是默认 8×，`shenzhen_z3.bin` 是其相同内容别名。按钮通过 Model 选择平台路径并让 View 切换图片源。
 - 地图显示区是 240×164 的双向滚动视口，初始滚动到 `(240, 164)`。底图、路线、当前位置和厕所目标位于同一个 720×492 内容层并随触摸拖动；右侧缩放按钮、行政区标签和 OSM 署名位于根层并保持固定。
 - `shenzhen_levels.bin` 使用 `EGMAPL2` 版本 2 头部，记录画布/视口尺寸、24 像素画布内容边距、初始滚动位置、七级 WGS84 边界、米/像素和 CRC32。当前模拟焦点是 `(22.5533410, 113.8782710)`；最大 64× 层级约为横向 2.1 米/像素、纵向 4.0 米/像素。
@@ -104,3 +104,11 @@
 - `shenzhen_levels.bin` 已验证头部、七条记录、文件长度和 CRC32；固件 Model 提供同边界的 WGS84 E7 到屏幕像素投影方法。
 - 地图资源已扩展为 720×492 大画布，地图视口支持双向拖动且边界受限；实际窗口已验证拖动时底图、路线和标记整体移动，固定缩放按钮不随地图移动。
 - 拖动后点击放大仍能正常切换文件并保持地图显示；`Debug|x64` 与 ESP32 `esp32dev` 构建均通过。2026-07-31 的 ESP32 Dev Module 构建资源占用为 RAM 9.6%、Flash 62.1%。
+
+## 2026-08-01 验证记录
+
+- 新增 Location、Network、Input、CareGo 发布订阅账户以及 `CareGoClient` 页面适配层；模拟器工程已同步新账户、服务和 DeviceStatus 页面，并移除旧 Power、Buzz、Encoder 和 StatusBar 工程项。
+- `Debug|x64` 生成成功，0 个错误；启动实际窗口后依次点击并截图检查 Home、Navigation、Setting 和 DeviceStatus，中文、地图和实时状态字段正常显示。
+- 仿真位置触发离线 `shenzhen_toilets.bin` 最近厕所查询；导航页显示由账户状态提供的目标和距离。
+- ESP32 `esp32dev` 最终构建成功，RAM 12.8%（41,988 / 327,680），Flash 81.4%（1,600,469 / 1,966,080）。
+- 真实 GPS、4G、短信、按键、SD、IMU 和地磁计均未在本次验证中连接；真实外部请求与 SMS 配置仍为关闭。

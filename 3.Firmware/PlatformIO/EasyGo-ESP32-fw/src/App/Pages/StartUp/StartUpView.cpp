@@ -10,10 +10,7 @@ void StartupView::Create(lv_obj_t* root)
     lv_obj_set_style_border_color(wave, lv_color_white(), 0);
     lv_obj_set_style_border_width(wave, 5, 0);
 
-    lv_obj_t* pinTail = EasyGoUi::Panel(root, 108, 69, 24, 24, lv_color_hex(0x8CB9F8), 4);
-    lv_obj_set_style_transform_angle(pinTail, 450, 0);
-    lv_obj_t* pinHead = EasyGoUi::Panel(root, 99, 42, 42, 42, lv_color_hex(0x8CB9F8), LV_RADIUS_CIRCLE);
-    EasyGoUi::Panel(pinHead, 13, 13, 16, 16, lv_color_hex(0xFFF9EF), LV_RADIUS_CIRCLE);
+    EasyGoUi::LocationPin(root, 99, 42, lv_color_hex(0x8CB9F8), lv_color_hex(0xFFF9EF));
     lv_obj_t* shadow = EasyGoUi::Panel(root, 97, 93, 46, 7, lv_color_hex(0xF4E7D2), LV_RADIUS_CIRCLE);
     lv_obj_set_style_bg_opa(shadow, LV_OPA_70, 0);
 
@@ -24,10 +21,7 @@ void StartupView::Create(lv_obj_t* root)
     (void)underline;
 
     EasyGoUi::Label(root, "安心出行  方便随行", &font_easygo_20, EasyGoUi::Blue, 0, 190, 240);
-    lv_obj_t* heartPoint = EasyGoUi::Panel(root, 110, 235, 21, 21, EasyGoUi::Red, 3);
-    lv_obj_set_style_transform_angle(heartPoint, 450, 0);
-    EasyGoUi::Panel(root, 104, 228, 19, 19, EasyGoUi::Red, LV_RADIUS_CIRCLE);
-    EasyGoUi::Panel(root, 119, 228, 19, 19, EasyGoUi::Red, LV_RADIUS_CIRCLE);
+    EasyGoUi::Label(root, "♥", &font_easygo_28, EasyGoUi::Red, 105, 224, 32);
     EasyGoUi::Panel(root, 99, 222, 3, 9, lv_color_hex(0xF8C06A), 2);
     EasyGoUi::Panel(root, 139, 222, 3, 9, lv_color_hex(0xF8C06A), 2);
     EasyGoUi::Panel(root, 119, 216, 3, 9, lv_color_hex(0xF8C06A), 2);

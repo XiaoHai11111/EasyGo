@@ -2,7 +2,7 @@
 
 using namespace Page;
 
-Setting::Setting() {}
+Setting::Setting() : refreshTimer(nullptr) {}
 Setting::~Setting() {}
 
 void Setting::onCustomAttrConfig()
@@ -16,7 +16,19 @@ void Setting::onViewLoad()
     Model.Init();
     View.Create(root, Model.VoiceEnabled(), Model.Brightness());
     lv_obj_add_event_cb(View.ui.voiceSwitch, onEvent, LV_EVENT_SHORT_CLICKED, this);
+    lv_obj_add_event_cb(View.ui.homeRow, onEvent, LV_EVENT_SHORT_CLICKED, this);
+    lv_obj_add_event_cb(View.ui.diagnosticsRow, onEvent, LV_EVENT_SHORT_CLICKED, this);
     lv_obj_add_event_cb(View.ui.backHome, onEvent, LV_EVENT_SHORT_CLICKED, this);
+    View.UpdateState(Model.State());
+    refreshTimer = lv_timer_create(onRefresh, 500, this);
+}
+
+void Setting::onRefresh(lv_timer_t* timer)
+{
+    Setting* instance = static_cast<Setting*>(timer->user_data);
+    if (!instance || instance->refreshTimer != timer || !instance->root ||
+        !lv_obj_is_valid(instance->root)) return;
+    instance->View.UpdateState(instance->Model.State());
 }
 
 void Setting::onEvent(lv_event_t* event)
@@ -31,16 +43,37 @@ void Setting::onEvent(lv_event_t* event)
     {
         instance->Manager->Pop();
     }
+    else if (target == instance->View.ui.homeRow)
+    {
+        instance->Model.SetHomeHere();
+        instance->View.UpdateState(instance->Model.State());
+    }
+    else if (target == instance->View.ui.diagnosticsRow)
+    {
+        instance->Manager->Push("Pages/DeviceStatus");
+    }
 }
 
 void Setting::onViewDidLoad() {}
 void Setting::onViewWillAppear() {}
 void Setting::onViewDidAppear() {}
-void Setting::onViewWillDisappear() {}
+void Setting::onViewWillDisappear()
+{
+    if (refreshTimer)
+    {
+        lv_timer_del(refreshTimer);
+        refreshTimer = nullptr;
+    }
+}
 void Setting::onViewDidDisappear() {}
 void Setting::onViewUnload() {}
 void Setting::onViewDidUnload()
 {
+    if (refreshTimer)
+    {
+        lv_timer_del(refreshTimer);
+        refreshTimer = nullptr;
+    }
     View.Delete();
     Model.Deinit();
 }

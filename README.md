@@ -2,13 +2,19 @@
 
 EasyGo 是一个面向老年人出行辅助场景的软硬件项目，当前重点验证便携式设备上的适老交互、附近厕所展示与简单导航、亲情联系人和紧急求助入口。
 
-项目目前处于 **240×320 LVGL UI 与 Windows PC 仿真联调阶段**。仓库中的地图、路线、距离、联系人和求助行为主要用于界面与数据链路演示，不代表生产环境已经接入真实定位、导航、拨号或告警服务。
+项目目前处于 **GPS、4G、DFPlayer、双按键与 240×320 LVGL 联调阶段**。离线厕所索引和状态机已经接入；道路路线仍为界面演示。真实短信和公网请求默认关闭，不代表生产环境已经完成告警服务验收。
 
 ## 当前进展
 
 - [x] ESP32 Dev Module PlatformIO 固件和 `esp32dev` 构建链路
 - [x] ST7789 240×320 显示、颜色与 FT6x36 电容触摸真机联调
-- [x] DFPlayer Mini UART2 音频和 microSD 提示音映射（已编译，待实体模块验证）
+- [x] DFPlayer Mini UART2 音频和 18 个 microSD 提示音映射（已编译，待实体模块验证）
+- [x] GPS NMEA 校验与 GGA/RMC 解析（GPIO36 单线接收）
+- [x] 4G UART1 网络注册探测、热点优先/4G 回退、厕所查询与 SMS 指令框架
+- [x] 双实体按键单击/双击/长按识别与发布订阅事件
+- [x] 离线厕所 POI 顺序扫描、WGS84 直线距离和最近目标选择
+- [x] 寻厕、回家、附近厕所提醒、普通话求助语音和 SOS 状态机
+- [x] GPS/网络/音频/待接入硬件设备状态页
 - [x] 240×320 启动页、首页、导航、亲情联系人和设置页面
 - [x] 固件页面源码与 Windows LVGL 模拟器共用
 - [x] 中文字体子集及资源生成脚本
@@ -16,7 +22,7 @@ EasyGo 是一个面向老年人出行辅助场景的软硬件项目，当前重�
 - [x] 深圳宝安区离线地图、七级缩放和厕所 POI 演示数据
 - [x] Windows x64 PlatformIO 协作依赖包
 - [ ] 真实厕所 POI 与道路路线服务
-- [ ] GNSS、蜂窝、Wi-Fi 或手机辅助定位方案
+- [ ] GPS、4G 和双按键实体模块联调与弱网/冷启动测试
 - [ ] 电子围栏完整判定与告警闭环
 - [ ] 真实拨号、消息和位置共享
 - [ ] 最终硬件、结构、电源、天线和量产方案
@@ -74,6 +80,7 @@ EasyGo/
 | TFT_eSPI | 2.3.58 |
 | MPU6050 | 0.0.1 |
 | SD / SPI | 1.1 |
+| EspSoftwareSerial | 8.2.0 |
 
 这些库已随固件工程保存在 `lib/`，不要再从 Library Manager 混装另一版本。
 
@@ -144,7 +151,8 @@ Windows x64 同事可使用：
 - `AppFactory`：页面类型创建
 - `PageManager`：页面注册、路由、缓存和动画
 - `ResourcePool`：字体与图片资源注册
-- `HAL`：屏幕、按键、IMU、电源、SD、蓝牙等硬件接口
+- `HAL`：屏幕、触摸、GPS、4G、双按键、DFPlayer、SD 与后续 IMU 接口
+- `AccountSystem`：Location、Network、Input、CareGo 等发布订阅主题和业务状态机
 
 当前页面链路：
 
@@ -154,7 +162,24 @@ Startup
       ├─ Navigation
       ├─ Family
       └─ Setting
+          └─ DeviceStatus
 ```
+
+## 当前 ESP32 引脚
+
+| 模块 | ESP32 引脚 | 说明 |
+| --- | --- | --- |
+| ST7789 | SCK18、MOSI23、MISO19、CS5、DC27、RST16 | VSPI，屏幕 LED 首次联调直连 3.3V |
+| 电容触摸 | SDA21、SCL22、INT25、RST33 | I²C，已识别 `0x38` FT6x36 兼容控制器 |
+| GPS | RX36 | 只连接 GPS TX，9600 baud，SoftwareSerial 输入 |
+| 4G | RX14、TX13 | UART1，115200 baud |
+| DFPlayer | RX26、TX17、BUSY34 | UART2；ESP32 TX17 到模块 RX 建议串 1kΩ |
+| 寻厕/语音按键 | GPIO32 | 低有效，固件使用内部上拉；按键另一端接 GND |
+| 回家/SOS 按键 | GPIO0（板载 BOOT） | 低有效，固件使用内部上拉；复位或上电时不要按住 |
+| 独立 SD（后续） | VSPI 共线、CS4 | 复用 18/19/23，仅独占 CS |
+| IMU INT（后续） | GPIO35 | 仅输入脚，由传感器中断输出主动驱动 |
+
+GPIO34–39 没有内部上拉，因此原 GPIO35 按键方案在没有外接电阻时会悬空并产生随机事件，现已改用 GPIO32。完整接线、配置开关、服务端 JSON 和验收步骤见 [GPS、4G、双按键与离线厕所功能说明](5.Docs/CareGO-GPS-4G-Keys-Bringup.md)。
 
 ## AI 协作提示词
 
@@ -243,6 +268,7 @@ E:\Projects\EasyGo\3.Firmware\PlatformIO\EasyGo-ESP32-fw
 | [固件开发环境教程](5.Docs/EasyGo-Firmware-Development-Environment.md) | VS Code、PlatformIO、依赖版本、编译、烧录、串口和故障排查 |
 | [ESP32 Dev Module + ST7789 点亮教程](5.Docs/ESP32Dev-ST7789-Wiring-and-Bringup.md) | 显示与电容触摸接线、固件配置、烧录、方向修正和真机排查 |
 | [DFPlayer Mini + microSD 音频教程](5.Docs/DFPlayer-Mini-SD-Audio-Bringup.md) | UART 接线、音频文件编号、供电、喇叭连接和串口排查 |
+| [GPS、4G、双按键与离线厕所说明](5.Docs/CareGO-GPS-4G-Keys-Bringup.md) | 引脚、配置开关、事件链路、API/SMS、离线降级和联调验收 |
 | [EasyGo 项目技能](5.Docs/develop-easygo/SKILL.md) | AI 工作流程、项目约束、安全边界和稳定开发方法 |
 | [当前项目状态](5.Docs/develop-easygo/references/project-state.md) | 已确认事实、阶段、事实边界、待确认项和近期产出 |
 | [LVGL 模拟器说明](5.Docs/develop-easygo/references/lvgl-simulator.md) | 页面共用、项目文件同步、模拟 SD、构建与实际验证记录 |
@@ -258,14 +284,15 @@ E:\Projects\EasyGo\3.Firmware\PlatformIO\EasyGo-ESP32-fw
 - 联系人、位置和轨迹开发数据必须使用合成或脱敏内容。
 - 未经明确授权，不触发真实拨号、短信、推送、蜂窝连接或位置上传。
 - 不把实验室单次成功描述为老人真实场景下的可靠性结论。
-- A7670 系列资料目前只是候选参考，不代表具体通信模块已经定型。
+- 当前 AT 流程按 A7670/FS-MCore 参考资料实现；不同固件版本的 HTTP AT 指令必须在实物上复核。
+- `CONFIG_CELLULAR_ENABLE_EXTERNAL_REQUESTS` 与 `CONFIG_CELLULAR_ENABLE_SMS` 默认为 `0`；只有在测试号码、SIM、资费和服务端均确认后再显式开启。
 
 ## 已知问题
 
 - ESP32 Dev Module + ST7789 已完成真机点亮、颜色修正和页面点击验证；串口确认触摸控制器地址为 `0x38`，与 FT6x36 兼容，但全屏坐标边界和长期稳定性仍需继续测试。
 - 设置页曾因 LVGL 8.1 日志回调签名不匹配而触发 `LoadProhibited`；代码已修复并重新编译，仍需烧录最新固件完成回归验证。
 - DFPlayer Mini 当前没有 UART 响应，microSD 文件、RX/TX 交叉、串联电阻和模块供电仍需在实体模块上排查。
-- 当前导航页面仍以演示数据为主，生产 POI、道路路线和定位链路尚未接入。
+- 最近厕所可从宝安区离线索引真实计算直线距离；屏幕道路路线仍为演示折线，未实现道路级规划与偏航重算。
 - 电子围栏的精度、迟滞、连续判定、接收人、告警渠道和失败恢复策略尚未确定。
 - 根项目尚未声明统一许可证；引用第三方库、字体和 OSM 数据时必须分别遵守其许可证和归属要求。
 
