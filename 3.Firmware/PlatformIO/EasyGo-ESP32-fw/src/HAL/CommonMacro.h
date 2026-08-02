@@ -1,3 +1,12 @@
+/**
+ * @file    CommonMacro.h
+ * @brief   常用通用宏定义
+ * @details 本文件定义 EasyGo 适老导航设备硬件抽象层的常用通用宏定义，供上层账户与页面统一调用。
+ * @author  CareBridge
+ * @date    2026-08-02
+ * @version 0.0.1
+ */
+
 #ifndef __COMMONMACRO_H
 #define __COMMONMACRO_H
 

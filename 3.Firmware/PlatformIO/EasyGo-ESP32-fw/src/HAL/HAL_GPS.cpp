@@ -1,3 +1,12 @@
+/**
+ * @file    HAL_GPS.cpp
+ * @brief   GPS NMEA 数据解析与定位信息发布
+ * @details 本文件实现 EasyGo 适老导航设备硬件抽象层的GPS NMEA 数据解析与定位信息发布，供上层账户与页面统一调用。
+ * @author  CareBridge
+ * @date    2026-08-02
+ * @version 0.0.1
+ */
+
 #include "HAL/HAL.h"
 #include "App/Accounts/Account_Master.h"
 #include <SoftwareSerial.h>

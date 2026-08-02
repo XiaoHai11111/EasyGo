@@ -1,3 +1,12 @@
+/**
+ * @file    HAL.h
+ * @brief   HAL 硬件抽象层统一接口声明
+ * @details 本文件定义 EasyGo 适老导航设备硬件抽象层的HAL 硬件抽象层统一接口声明，供上层账户与页面统一调用。
+ * @author  CareBridge
+ * @date    2026-08-02
+ * @version 0.0.1
+ */
+
 #ifndef __HAL_H
 #define __HAL_H
 

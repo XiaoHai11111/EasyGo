@@ -1,3 +1,12 @@
+/**
+ * @file    CareGoClient.cpp
+ * @brief   CareGo 客户端服务实现
+ * @details 本文件实现 CareGo 客户端服务的CareGo 客户端服务实现，负责订阅账户状态并协调导航、提醒与 SOS 逻辑。
+ * @author  CareBridge
+ * @date    2026-08-02
+ * @version 0.0.1
+ */
+
 #include "CareGoClient.h"
 #include <string.h>
 

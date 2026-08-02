@@ -1,3 +1,12 @@
+/**
+ * @file    Config.h
+ * @brief   系统全局配置宏与硬件引脚定义
+ * @details 本文件定义 EasyGo 适老导航固件的系统全局配置宏与硬件引脚定义，直接影响编译与运行行为。
+ * @author  CareBridge
+ * @date    2026-08-02
+ * @version 0.0.1
+ */
+
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
@@ -102,8 +111,8 @@
 // #define CONFIG_WIFI_PASSWORD        "11112222"
 #define CONFIG_WIFI_SSID            ""
 #define CONFIG_WIFI_PASSWORD        ""
-/* Public toilet HTTP stays disabled. SMS is enabled for the user-authorized SOS contact. */
-#define CONFIG_CELLULAR_ENABLE_EXTERNAL_REQUESTS 0
+/* Public toilet HTTP query is enabled for bring-up/debug. SMS is enabled for the user-authorized SOS contact. */
+#define CONFIG_CELLULAR_ENABLE_EXTERNAL_REQUESTS 1
 #define CONFIG_CELLULAR_ENABLE_SMS               1
 #define CONFIG_CELLULAR_ENABLE_LBS               1
 /* GPS must remain unavailable for this long before the first 4G LBS request. */

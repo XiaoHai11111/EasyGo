@@ -1,3 +1,12 @@
+/**
+ * @file    Account_Master.h
+ * @brief   账户系统注册与对外接口声明
+ * @details 本文件定义 EasyGo 账户系统中的账户系统注册与对外接口声明，通过 Account 机制与页面、HAL 层解耦。
+ * @author  CareBridge
+ * @date    2026-08-02
+ * @version 0.0.1
+ */
+
 #ifndef __DATA_PROC_H
 #define __DATA_PROC_H
 

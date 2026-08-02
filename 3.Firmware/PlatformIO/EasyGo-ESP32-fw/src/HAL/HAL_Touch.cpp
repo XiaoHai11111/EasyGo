@@ -1,3 +1,12 @@
+/**
+ * @file    HAL_Touch.cpp
+ * @brief   电容触摸控制器识别与坐标上报
+ * @details 本文件实现 EasyGo 适老导航设备硬件抽象层的电容触摸控制器识别与坐标上报，供上层账户与页面统一调用。
+ * @author  CareBridge
+ * @date    2026-08-02
+ * @version 0.0.1
+ */
+
 #include "HAL/HAL.h"
 #include <Wire.h>
 

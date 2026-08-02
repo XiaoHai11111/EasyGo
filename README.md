@@ -304,3 +304,59 @@ E:\Projects\EasyGo\3.Firmware\PlatformIO\EasyGo-ESP32-fw
 4. 只把实际执行过的测试标记为通过。
 5. 大型生成文件和离线依赖包提交前先确认仓库策略，必要时使用 Git LFS 或外部制品存储。
 6. 只有得到明确授权后才执行 Git 提交、推送、固件烧录或真实外部通信。
+
+## Git 推送（GitHub + Gitee）
+
+本仓库同时使用两个远程：GitHub（`origin`）和 Gitee（`gitee`）。手动推送流程如下。
+
+### 1. 提交改动
+
+```powershell
+git status                          # 先检查改动，保留他人未提交内容
+git add -A                          # 暂存全部改动
+git commit -m "feat(easygo): <本次改动说明>"
+```
+
+### 2. 推送到 GitHub
+
+```powershell
+git push origin master
+```
+
+### 3. 推送到 Gitee
+
+Gitee 的 master 历史根（`da0df58`）与本地 master 不共享祖先，直接推送会报
+`non-fast-forward`。用“同步分支 + 历史嫁接”的方式，避免强制推送：
+
+```powershell
+git fetch gitee                     # 先刷新 Gitee 远程引用
+
+# 从当前 master 建一个临时同步分支
+git switch -c codex/gitee-master-sync master
+
+# 用 -s ours 把 Gitee 历史根嫁接进来（保留当前代码树，不产生冲突）
+git merge -s ours --allow-unrelated-histories gitee/master `
+  -m "chore(gitee): 同步 EasyGo 当前 master 到 Gitee（历史嫁接，保留当前代码树）"
+
+# 快进推送到 Gitee master；Gitee 免费版不支持 LFS，需跳过 git-lfs 预推钩子
+git push --no-verify gitee codex/gitee-master-sync:master
+
+git switch master                   # 切回本地 master
+```
+
+注意事项：
+
+- Gitee 远程为 `https://gitee.com/whateverit/hks_insta.git`。
+- 大文件 `0.References/PlatformIO-ESP32-6.9.0-Windows-x64.zip`（约 365 MB）通过
+  Git LFS 管理；Gitee 免费仓库不支持 LFS，该文件在 Gitee 上只有指针，真实内容
+  只存在 GitHub LFS。若希望 Gitee 也拿到真实文件，需先移出 LFS 或改用外部制品存储。
+
+### 4. 删除本地临时分支
+
+```powershell
+git branch                          # 列出本地分支
+git branch -d <分支名>              # 安全删除：仅当分支已合并时可用
+git branch -D <分支名>              # 强制删除：未合并的分支（例如 codex/gitee-master-sync）
+```
+
+示例：`git branch -D codex/gitee-master-sync`

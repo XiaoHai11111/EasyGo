@@ -1,3 +1,12 @@
+/**
+ * @file    ACT_SysConfig.cpp
+ * @brief   系统配置账户与应用设置管理
+ * @details 本文件实现 EasyGo 账户系统中的系统配置账户与应用设置管理，通过 Account 机制与页面、HAL 层解耦。
+ * @author  CareBridge
+ * @date    2026-08-02
+ * @version 0.0.1
+ */
+
 #include "Account_Master.h"
 #include "HAL/HAL.h"
 #include "App/Configs/Config.h"

@@ -1,3 +1,12 @@
+/**
+ * @file    ACT_Storage.cpp
+ * @brief   存储账户与持久化配置读写
+ * @details 本文件实现 EasyGo 账户系统中的存储账户与持久化配置读写，通过 Account 机制与页面、HAL 层解耦。
+ * @author  CareBridge
+ * @date    2026-08-02
+ * @version 0.0.1
+ */
+
 #include "Account_Master.h"
 #include "HAL/HAL.h"
 #include "App/Utils/StorageService/StorageService.h"

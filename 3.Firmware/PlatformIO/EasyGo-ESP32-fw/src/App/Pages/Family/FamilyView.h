@@ -1,3 +1,12 @@
+/**
+ * @file    FamilyView.h
+ * @brief   亲情联系人页视图定义
+ * @details 本文件定义 EasyGo 的亲情联系人页视图定义，遵循 Page/View/Model 分层架构，固件与模拟器共用。
+ * @author  CareBridge
+ * @date    2026-08-02
+ * @version 0.0.1
+ */
+
 #pragma once
 
 #include "../Common/EasyGoUi.h"

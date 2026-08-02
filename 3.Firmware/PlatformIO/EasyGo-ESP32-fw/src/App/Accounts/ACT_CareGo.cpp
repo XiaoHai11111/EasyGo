@@ -1,3 +1,12 @@
+/**
+ * @file    ACT_CareGo.cpp
+ * @brief   CareGo 导航、提醒与 SOS 状态机账户
+ * @details 本文件实现 EasyGo 账户系统中的CareGo 导航、提醒与 SOS 状态机账户，通过 Account 机制与页面、HAL 层解耦。
+ * @author  CareBridge
+ * @date    2026-08-02
+ * @version 0.0.1
+ */
+
 #include "Account_Master.h"
 #include "App/Configs/Config.h"
 #include <math.h>

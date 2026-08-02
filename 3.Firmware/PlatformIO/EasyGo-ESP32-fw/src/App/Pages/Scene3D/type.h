@@ -1,3 +1,12 @@
+/**
+ * @file    type.h
+ * @brief   3D 渲染基础类型与常量定义
+ * @details 本文件定义 EasyGo 的3D 渲染基础类型与常量定义，遵循 Page/View/Model 分层架构，固件与模拟器共用。
+ * @author  CareBridge
+ * @date    2026-08-02
+ * @version 0.0.1
+ */
+
 #ifndef TYPE_H
 #define TYPE_H
 

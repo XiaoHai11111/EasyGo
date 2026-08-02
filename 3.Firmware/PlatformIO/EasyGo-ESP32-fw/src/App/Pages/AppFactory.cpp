@@ -1,3 +1,12 @@
+/**
+ * @file    AppFactory.cpp
+ * @brief   页面工厂实现与页面注册
+ * @details 本文件实现 EasyGo 的页面工厂实现与页面注册，遵循 Page/View/Model 分层架构，固件与模拟器共用。
+ * @author  CareBridge
+ * @date    2026-08-02
+ * @version 0.0.1
+ */
+
 /*
  * MIT License
  * Copyright (c) 2021 _VIFEXTech

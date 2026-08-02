@@ -1,3 +1,12 @@
+/**
+ * @file    HAL_Def.h
+ * @brief   HAL 层数据结构与枚举定义
+ * @details 本文件定义 EasyGo 适老导航设备硬件抽象层的HAL 层数据结构与枚举定义，供上层账户与页面统一调用。
+ * @author  CareBridge
+ * @date    2026-08-02
+ * @version 0.0.1
+ */
+
 #ifndef __HAL_DEF_H
 #define __HAL_DEF_H
 

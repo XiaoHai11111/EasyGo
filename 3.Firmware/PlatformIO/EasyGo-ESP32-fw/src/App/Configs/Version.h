@@ -1,3 +1,12 @@
+/**
+ * @file    Version.h
+ * @brief   项目版本号与构建信息定义
+ * @details 本文件定义 EasyGo 适老导航固件的项目版本号与构建信息定义，直接影响编译与运行行为。
+ * @author  CareBridge
+ * @date    2026-08-02
+ * @version 0.0.1
+ */
+
 /*
  * MIT License
  * Copyright (c) 2021 _VIFEXTech

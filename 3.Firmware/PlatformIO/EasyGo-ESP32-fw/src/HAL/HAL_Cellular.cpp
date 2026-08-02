@@ -1,3 +1,12 @@
+/**
+ * @file    HAL_Cellular.cpp
+ * @brief   4G 蜂窝网络 AT 指令与数据通信实现
+ * @details 本文件实现 EasyGo 适老导航设备硬件抽象层的4G 蜂窝网络 AT 指令与数据通信实现，供上层账户与页面统一调用。
+ * @author  CareBridge
+ * @date    2026-08-02
+ * @version 0.0.1
+ */
+
 #include "HAL/HAL.h"
 #include "App/Accounts/Account_Master.h"
 #include <ArduinoJson.h>
@@ -86,6 +95,7 @@ void ParseNetworkClock(const String& response, AccountSystem::Network_Info_t& st
 
 void FillNearbyResult(AccountSystem::Network_Info_t& result, const String& json)
 {
+    Serial.printf("Network: nearby API response: %s\r\n", json.c_str());
     DynamicJsonDocument document(1536);
     const DeserializationError error = deserializeJson(document, json);
     if (error)

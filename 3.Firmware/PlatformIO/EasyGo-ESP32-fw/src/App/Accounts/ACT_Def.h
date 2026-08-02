@@ -1,3 +1,12 @@
+/**
+ * @file    ACT_Def.h
+ * @brief   账户数据结构、事件与状态定义
+ * @details 本文件定义 EasyGo 账户系统中的账户数据结构、事件与状态定义，通过 Account 机制与页面、HAL 层解耦。
+ * @author  CareBridge
+ * @date    2026-08-02
+ * @version 0.0.1
+ */
+
 #ifndef __DATA_PROC_DEF_H
 #define __DATA_PROC_DEF_H
 

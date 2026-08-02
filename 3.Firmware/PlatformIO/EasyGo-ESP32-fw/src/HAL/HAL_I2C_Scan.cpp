@@ -1,3 +1,12 @@
+/**
+ * @file    HAL_I2C_Scan.cpp
+ * @brief   I2C 总线初始化与设备地址扫描
+ * @details 本文件实现 EasyGo 适老导航设备硬件抽象层的I2C 总线初始化与设备地址扫描，供上层账户与页面统一调用。
+ * @author  CareBridge
+ * @date    2026-08-02
+ * @version 0.0.1
+ */
+
 #include "HAL/HAL.h"
 #include "Wire.h"
 

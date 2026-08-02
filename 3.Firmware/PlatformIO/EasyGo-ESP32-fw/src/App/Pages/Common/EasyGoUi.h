@@ -1,3 +1,12 @@
+/**
+ * @file    EasyGoUi.h
+ * @brief   EasyGo 通用 UI 组件与字体声明
+ * @details 本文件定义 EasyGo 的EasyGo 通用 UI 组件与字体声明，遵循 Page/View/Model 分层架构，固件与模拟器共用。
+ * @author  CareBridge
+ * @date    2026-08-02
+ * @version 0.0.1
+ */
+
 #pragma once
 
 #include "../Page.h"

@@ -1,3 +1,12 @@
+/**
+ * @file    HAL_Backlight.cpp
+ * @brief   屏幕背光亮度控制实现
+ * @details 本文件实现 EasyGo 适老导航设备硬件抽象层的屏幕背光亮度控制实现，供上层账户与页面统一调用。
+ * @author  CareBridge
+ * @date    2026-08-02
+ * @version 0.0.1
+ */
+
 #include "Port/Display.h"
 #include "HAL/HAL.h"
 

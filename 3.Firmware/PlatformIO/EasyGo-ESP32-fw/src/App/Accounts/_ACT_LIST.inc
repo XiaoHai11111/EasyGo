@@ -1,3 +1,12 @@
+/**
+ * @file    _ACT_LIST.inc
+ * @brief   账户节点注册列表
+ * @details 本文件维护账户系统的账户节点注册列表，新增账户时需同步更新。
+ * @author  CareBridge
+ * @date    2026-08-02
+ * @version 0.0.1
+ */
+
 /* Data processing node list */
 
 ACT_DEF(Storage, 0);

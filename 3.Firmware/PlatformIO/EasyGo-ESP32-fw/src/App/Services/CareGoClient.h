@@ -1,3 +1,12 @@
+/**
+ * @file    CareGoClient.h
+ * @brief   CareGo 客户端服务接口声明
+ * @details 本文件定义 CareGo 客户端服务的CareGo 客户端服务接口声明，负责订阅账户状态并协调导航、提醒与 SOS 逻辑。
+ * @author  CareBridge
+ * @date    2026-08-02
+ * @version 0.0.1
+ */
+
 #pragma once
 
 #include "App/Accounts/Account_Master.h"

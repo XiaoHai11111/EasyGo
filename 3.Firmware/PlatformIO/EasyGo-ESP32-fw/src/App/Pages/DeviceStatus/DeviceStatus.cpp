@@ -1,3 +1,12 @@
+/**
+ * @file    DeviceStatus.cpp
+ * @brief   设备状态页逻辑实现
+ * @details 本文件实现 EasyGo 的设备状态页逻辑实现，遵循 Page/View/Model 分层架构，固件与模拟器共用。
+ * @author  CareBridge
+ * @date    2026-08-02
+ * @version 0.0.1
+ */
+
 #include "DeviceStatus.h"
 
 using namespace Page;
